@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import { DEFAULT_START } from '../utils/dateHelpers';
-import { ensureAnonymousUser, isFirebaseConfigured } from '../services/firebase';
+import {
+  isFirebaseConfigured,
+  signInWithGoogleUser,
+  signOutUser,
+  subscribeToAuthState,
+} from '../services/firebase';
 import {
   buildStateSnapshot,
   clearPersistedState,
@@ -112,8 +117,10 @@ function uid() {
 export function StudyProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [cloudUid, setCloudUid] = useState(null);
+  const [cloudUser, setCloudUser] = useState(null);
   const [cloudReady, setCloudReady] = useState(!isFirebaseConfigured);
   const [cloudBootstrapped, setCloudBootstrapped] = useState(!isFirebaseConfigured);
+  const [cloudAuthError, setCloudAuthError] = useState(null);
 
   useEffect(() => {
     const hydrated = hydrateState();
@@ -122,20 +129,23 @@ export function StudyProvider({ children }) {
 
   useEffect(() => {
     if (!isFirebaseConfigured) return;
-    let cancelled = false;
-    ensureAnonymousUser()
-      .then((user) => {
-        if (cancelled) return;
-        setCloudUid(user?.uid || null);
-        setCloudReady(true);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setCloudReady(true);
-      });
-    return () => {
-      cancelled = true;
-    };
+    const unsubscribe = subscribeToAuthState((user) => {
+      setCloudUid(user?.uid || null);
+      setCloudUser(
+        user
+          ? {
+            uid: user.uid,
+            email: user.email || null,
+            displayName: user.displayName || null,
+            photoURL: user.photoURL || null,
+          }
+          : null,
+      );
+      setCloudBootstrapped(!user);
+      setCloudReady(true);
+      setCloudAuthError(null);
+    });
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -232,12 +242,42 @@ export function StudyProvider({ children }) {
       dispatch({ type: 'RESET' });
     };
 
+    const signInWithGoogle = async () => {
+      try {
+        setCloudAuthError(null);
+        await signInWithGoogleUser();
+      } catch (err) {
+        setCloudAuthError(err?.message || 'Google sign-in failed.');
+        throw err;
+      }
+    };
+
+    const signOutFromCloud = async () => {
+      try {
+        setCloudAuthError(null);
+        await signOutUser();
+      } catch (err) {
+        setCloudAuthError(err?.message || 'Sign-out failed.');
+        throw err;
+      }
+    };
+
     return {
       ...state,
       cloud: {
         enabled: isFirebaseConfigured,
-        status: isFirebaseConfigured ? (cloudBootstrapped ? 'connected' : 'connecting') : 'local-only',
+        status: !isFirebaseConfigured
+          ? 'local-only'
+          : !cloudReady
+            ? 'connecting'
+            : !cloudUid
+              ? 'signed-out'
+              : cloudBootstrapped
+                ? 'connected'
+                : 'syncing',
         uid: cloudUid,
+        user: cloudUser,
+        authError: cloudAuthError,
       },
       updateDailyBlock,
       updateDailyNotes,
@@ -252,8 +292,10 @@ export function StudyProvider({ children }) {
       setCatchUpDecision,
       restoreData,
       resetAll,
+      signInWithGoogle,
+      signOutFromCloud,
     };
-  }, [state, cloudUid, cloudBootstrapped]);
+  }, [state, cloudUid, cloudBootstrapped, cloudReady, cloudUser, cloudAuthError]);
 
   return <StudyContext.Provider value={api}>{children}</StudyContext.Provider>;
 }

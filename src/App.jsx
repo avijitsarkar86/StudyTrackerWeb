@@ -17,9 +17,10 @@ const NAV_ITEMS = [
 ];
 
 function Shell() {
-  const { isLoaded, settings, updateSettings } = useStudy();
+  const { isLoaded, settings, updateSettings, cloud, signInWithGoogle } = useStudy();
   const [activeTab, setActiveTab] = useState('today');
   const [startDate, setStartDate] = useState(new Date());
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   const view = useMemo(() => {
     if (activeTab === 'progress') return <ProgressView />;
@@ -34,6 +35,55 @@ function Shell() {
   }
 
   const showOnboarding = !settings.firstLaunchComplete;
+
+  const onSignIn = async () => {
+    try {
+      setIsSigningIn(true);
+      await signInWithGoogle();
+    } catch {
+      // Auth errors are already exposed by cloud.authError in context/state.
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  if (cloud?.enabled && (cloud?.status === 'connecting' || cloud?.status === 'syncing')) {
+    return <div className="boot">Preparing secure Google login...</div>;
+  }
+
+  if (cloud?.enabled && !cloud?.uid) {
+    return (
+      <div className="container">
+        <header className="cover">
+          <div className="badge">Official Study Blueprint - Dual Exam Edition</div>
+          <h1>
+            WBCS &amp; WBPSC
+            <br />
+            <span>Study Tracker Web</span>
+          </h1>
+          <p className="cover-sub">Sign in with your Google account to start and keep your data synced across devices.</p>
+          <div className="cover-divider" />
+          <div className="cover-meta">
+            <div className="meta-item"><div className="mlabel">Auth</div><div className="mvalue">Google Required</div></div>
+            <div className="meta-item"><div className="mlabel">Storage</div><div className="mvalue">Cloud + Local</div></div>
+            <div className="meta-item"><div className="mlabel">Sync</div><div className="mvalue">Per Account</div></div>
+          </div>
+        </header>
+
+        <div className="page-body">
+          <div className="alert alert-info">
+            <strong>Login required.</strong> Please sign in with Google to continue.
+            <div className="row-actions" style={{ marginTop: 8 }}>
+              <button className="btn btn-primary" onClick={onSignIn} disabled={isSigningIn}>
+                {isSigningIn ? 'Signing in...' : 'Continue with Google'}
+              </button>
+            </div>
+            {cloud?.authError ? <p className="muted">{cloud.authError}</p> : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">

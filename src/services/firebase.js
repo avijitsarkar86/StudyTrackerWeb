@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  getAuth,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -21,18 +27,32 @@ export const isFirebaseConfigured = Boolean(
 let appInstance = null;
 let auth = null;
 let db = null;
+let googleProvider = null;
 
 if (isFirebaseConfigured) {
   appInstance = initializeApp(firebaseConfig);
   auth = getAuth(appInstance);
   db = getFirestore(appInstance);
+  googleProvider = new GoogleAuthProvider();
 }
 
 export { auth, db };
 
-export async function ensureAnonymousUser() {
-  if (!auth) return null;
-  if (auth.currentUser) return auth.currentUser;
-  await signInAnonymously(auth);
-  return auth.currentUser;
+export function subscribeToAuthState(callback) {
+  if (!auth) {
+    callback(null);
+    return () => {};
+  }
+  return onAuthStateChanged(auth, callback);
+}
+
+export async function signInWithGoogleUser() {
+  if (!auth || !googleProvider) return null;
+  const result = await signInWithPopup(auth, googleProvider);
+  return result.user;
+}
+
+export async function signOutUser() {
+  if (!auth) return;
+  await signOut(auth);
 }

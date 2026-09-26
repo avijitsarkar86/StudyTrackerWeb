@@ -5,7 +5,19 @@ import { getCurrentWeek, getWeekDateRange } from '../utils/dateHelpers';
 import { clearPersistedState, exportStateAsFile, parseImportedBackup } from '../utils/storage';
 
 export default function SettingsView() {
-  const { settings, updateSettings, dailyProgress, mockScores, errorLog, missedDays, restoreData, resetAll, cloud } = useStudy();
+  const {
+    settings,
+    updateSettings,
+    dailyProgress,
+    mockScores,
+    errorLog,
+    missedDays,
+    restoreData,
+    resetAll,
+    cloud,
+    signInWithGoogle,
+    signOutFromCloud,
+  } = useStudy();
   const fileInputRef = useRef(null);
   const week = getCurrentWeek(settings.startDate);
   const weekRange = getWeekDateRange(week, settings.startDate);
@@ -40,6 +52,24 @@ export default function SettingsView() {
     if (!ok) return;
     clearPersistedState();
     resetAll();
+  };
+
+  const onConnectGoogle = async () => {
+    try {
+      await signInWithGoogle();
+    } catch {
+      // Auth error is surfaced in cloud.authError.
+    }
+  };
+
+  const onSignOutGoogle = async () => {
+    const ok = window.confirm('Sign out from Google cloud sync on this browser? Local data will remain available.');
+    if (!ok) return;
+    try {
+      await signOutFromCloud();
+    } catch {
+      // Auth error is surfaced in cloud.authError.
+    }
   };
 
   return (
@@ -150,6 +180,30 @@ export default function SettingsView() {
         </tbody>
       </table>
 
+      <div className="sub-header">Google Cloud Sync</div>
+      <div className="settings-card">
+        <div className="settings-row">
+          <span>Connection</span>
+          <strong>{cloud?.status || 'local-only'}</strong>
+        </div>
+        <div className="settings-row">
+          <span>Signed-in account</span>
+          <strong>{cloud?.user?.email || cloud?.user?.displayName || 'Not signed in'}</strong>
+        </div>
+        {cloud?.authError ? <p className="muted">Auth error: {cloud.authError}</p> : null}
+        <div className="table-actions" style={{ marginTop: 12 }}>
+          {cloud?.enabled ? (
+            cloud?.uid ? (
+              <button className="btn btn-ghost" onClick={onSignOutGoogle}>Sign Out</button>
+            ) : (
+              <button className="btn btn-primary" onClick={onConnectGoogle}>Sign In with Google</button>
+            )
+          ) : (
+            <p className="muted">Add Firebase env keys to enable Google sync.</p>
+          )}
+        </div>
+      </div>
+
       <div className="sub-header">Backup & Restore</div>
       <table className="responsive-table">
         <thead>
@@ -184,7 +238,7 @@ export default function SettingsView() {
       <div className="note-box">
         <strong>Storage note</strong>
         <p>
-          This web app uses LocalStorage by default and automatically switches to Firebase sync when valid VITE_FIREBASE_* environment keys are provided. JSON export/import remains available for backup.
+          This web app always stores data in LocalStorage. When you sign in with Google and Firebase is configured, the same state is also synced to Firestore so your data aligns across devices for that account.
         </p>
       </div>
 
