@@ -1,0 +1,128 @@
+export const DAILY_BLOCKS = [
+  { id: 'warmup', label: 'Warm-up / Exercise', time: '06:00-06:30', hours: 0.5, category: 'wellness' },
+  { id: 'flute_am', label: 'Flute - Morning', time: '06:30-07:00', hours: 0.5, category: 'wellness' },
+  { id: 'plant_care', label: 'Plant Care', time: '07:00-07:45', hours: 0.75, category: 'wellness' },
+  { id: 'vocab', label: 'Vocab Ritual', time: '07:45-08:15', hours: 0.5, category: 'study' },
+  { id: 'block1', label: 'Block 1 - Primary GS', time: '08:15-10:45', hours: 2.5, category: 'study', isCore: true },
+  { id: 'block1_c', label: 'Block 1 Consolidation', time: '10:45-11:15', hours: 0.5, category: 'study' },
+  { id: 'block2', label: 'Block 2 - CS Honors Optional', time: '11:30-13:30', hours: 2.0, category: 'study', isCore: true },
+  { id: 'block3', label: 'Block 3 - Secondary GS', time: '15:00-17:00', hours: 2.0, category: 'study', isCore: true },
+  { id: 'block4', label: 'Block 4 - Mathematics', time: '17:00-17:30', hours: 0.5, category: 'study' },
+  { id: 'block5', label: 'Block 5 - Static GK', time: '17:30-18:00', hours: 0.5, category: 'study' },
+  { id: 'flute_pm', label: 'Flute - Evening', time: '18:00-18:30', hours: 0.5, category: 'wellness' },
+  { id: 'block6', label: 'Block 6 - Current Affairs', time: '18:30-19:15', hours: 0.75, category: 'study' },
+  { id: 'block7', label: 'Block 7 - Spaced Revision', time: '19:15-20:15', hours: 1.0, category: 'study' },
+  { id: 'block8', label: 'Block 8 - Writing Practice', time: '22:00-22:30', hours: 0.5, category: 'study' },
+  { id: 'block9', label: 'Block 9 - Light Revision', time: '22:30-23:30', hours: 1.0, category: 'study' },
+];
+
+export const SATURDAY_BLOCKS = [
+  { id: 'morning_r', label: 'Morning Routine', time: '06:00-07:45', hours: 1.75, category: 'wellness' },
+  { id: 'prelims', label: 'Full Prelims Mock (200 MCQs)', time: '08:00-10:00', hours: 2.0, category: 'mock', isCore: true },
+  { id: 'mains_sim', label: 'Mains Paper / 2nd Mock', time: '10:30-12:30', hours: 2.0, category: 'mock' },
+  { id: 'error_a', label: 'Mandatory Error Analysis', time: '15:00-17:00', hours: 2.0, category: 'study', isCore: true },
+  { id: 'flute_pm', label: 'Flute - Evening', time: '17:00-17:30', hours: 0.5, category: 'wellness' },
+  { id: 'tgt_rev', label: 'Targeted Revision', time: '17:30-19:30', hours: 2.0, category: 'study' },
+  { id: 'light_ca', label: 'Light CA / Flashcards', time: '22:00-23:30', hours: 1.5, category: 'study' },
+];
+
+export const SUNDAY_BLOCKS = [
+  { id: 'flute_am', label: 'Flute - Morning', time: '06:30-07:00', hours: 0.5, category: 'wellness' },
+  { id: 'plant_care', label: 'Plant Care (Extended)', time: '07:00-08:00', hours: 1.0, category: 'wellness' },
+  { id: 'vocab', label: 'Vocab Ritual (Light)', time: '08:00-08:30', hours: 0.5, category: 'study' },
+  { id: 'eng_paper', label: 'English Descriptive Paper', time: '08:30-10:30', hours: 2.0, category: 'study', isCore: true },
+  { id: 'ben_paper', label: 'Bengali Paper (Timed)', time: '10:30-12:30', hours: 2.0, category: 'study', isCore: true },
+  { id: 'weak_area', label: 'Weak Area Deep-Dive', time: '12:30-13:30', hours: 1.0, category: 'study' },
+  { id: 'cs_honors_sun', label: 'CS Honors Problem-Solving', time: '15:00-17:00', hours: 2.0, category: 'study' },
+  { id: 'flute_pm', label: 'Flute - Evening', time: '17:00-17:30', hours: 0.5, category: 'wellness' },
+  { id: 'wk_plan', label: 'Next Week Planning', time: '22:00-23:00', hours: 1.0, category: 'planning' },
+];
+
+export const WEEKLY_ROTATION = {
+  Monday: { block1: 'Indian History - Ancient & Medieval', block3: 'Physical Geography of India' },
+  Tuesday: { block1: 'Indian History - Modern & Freedom Struggle', block3: 'West Bengal Geography + Districts' },
+  Wednesday: { block1: 'Indian Polity - Constitution, FR, DPSP', block3: 'Indian Economy - Planning, Agriculture' },
+  Thursday: { block1: 'Indian Polity - Parliament, Judiciary, Local Bodies', block3: 'RBI, Banking, WB Economy & Budget' },
+  Friday: { block1: 'General Science (Physics, Chemistry, Biology)', block3: 'Environment, Ecology, Computer Awareness' },
+};
+
+export const PHASE3_OVERRIDE = {
+  13: 'Computer Awareness (Exam MCQ Pattern Focus)',
+  14: 'Office Procedure & Admin (WB Service Rules, RTI Act)',
+  15: 'Basic Law & Acts (Contract Act, CPC, WB Municipal Act)',
+  16: 'WB Local Govt - DM/SDO/BDO, Panchayati Raj, District Admin',
+};
+
+export const PHASES = [
+  { phase: 1, weeks: [1, 6], name: 'Foundation Reading', shortName: 'Foundation', color: '#1f7cff', period: 'Sep 2026', goal: 'First reading. Concept clarity only.' },
+  { phase: 2, weeks: [7, 12], name: 'PYQ Depth + 2nd Reading', shortName: 'PYQ Depth', color: '#b057d6', period: 'Oct-Nov 2026', goal: 'Second reading + active recall. Mocks begin.' },
+  { phase: 3, weeks: [13, 18], name: 'Writing + Misc-Only', shortName: 'Writing+Misc', color: '#ff9f1a', period: 'Dec 2026-Jan 2027', goal: 'Mains writing + Misc-only syllabus.' },
+  { phase: 4, weeks: [19, 24], name: 'Full Dual Simulation', shortName: 'Simulation', color: '#ef4f5f', period: 'Feb 2027', goal: 'Peak performance. Revision + mocks only.' },
+  { phase: 5, weeks: [25, 26], name: 'Buffer - Exam Ready', shortName: 'Buffer', color: '#27b06e', period: 'Mar 2027', goal: 'Light revision, rest, logistics check.' },
+];
+
+export const MOCK_WEEKS = {
+  wbcs: [7, 9, 11, 13, 15, 19, 23],
+  misc: [8, 10, 12, 14, 16, 20, 24],
+};
+
+export const SCORE_TARGETS = {
+  2: { wbcs: [90, 110], misc: [100, 120], label: 'Building Base' },
+  3: { wbcs: [110, 125], misc: [120, 135], label: 'Consolidating' },
+  4: { wbcs: [130, 150], misc: [140, 155], label: 'Peak Readiness' },
+};
+
+export const WEEK_PLAN = [
+  { week: 1, topic: 'Polity - Laxmikanth Ch 1-20' },
+  { week: 2, topic: 'Polity - Ch 21-40' },
+  { week: 3, topic: 'History - NCERT 6-8 + Bipan Chandra' },
+  { week: 4, topic: 'History - Modern + Freedom Struggle' },
+  { week: 5, topic: 'Geography - NCERT 11-12 + India Geography' },
+  { week: 6, topic: 'WB Geography + CS Module' },
+  { week: 7, topic: 'Economy - Basics, Planning, Agriculture' },
+  { week: 8, topic: 'Economy - RBI, Banking, Budget + PYQs' },
+  { week: 9, topic: 'Science - Physics, Chemistry, Biology' },
+  { week: 10, topic: 'Environment - Full Revision + PYQs' },
+  { week: 11, topic: 'Polity + History - 2nd read + WBCS PYQs' },
+  { week: 12, topic: 'Geography + Economy - 2nd read + Misc PYQs' },
+  { week: 13, topic: 'Computer Awareness (MCQ focus)' },
+  { week: 14, topic: 'Office Procedure & Admin' },
+  { week: 15, topic: 'Basic Law & Acts' },
+  { week: 16, topic: 'WB Local Govt Deep-Dive' },
+  { week: 17, topic: 'English Mains - timed papers' },
+  { week: 18, topic: 'Bengali Mains - timed papers' },
+  { week: 19, topic: 'Polity + History final revision' },
+  { week: 20, topic: 'Geography + Economy final revision' },
+  { week: 21, topic: 'Science + Environment + Computer Awareness' },
+  { week: 22, topic: 'CS Honors full revision + timed answers' },
+  { week: 23, topic: '3 WBCS mocks + 3 Misc mocks' },
+  { week: 24, topic: 'Final error logs review' },
+  { week: 25, topic: '2 mocks + rest + light CA' },
+  { week: 26, topic: 'Final mock + rest + logistics' },
+];
+
+export const MILESTONES = [
+  { week: 6, title: 'Phase 1 Complete', body: 'Foundation reading done.' },
+  { week: 12, title: 'Phase 2 Complete', body: 'Both PYQ tracks solved.' },
+  { week: 16, title: 'Misc-Only Syllabus Done', body: 'All Misc-only topics covered.' },
+  { week: 18, title: 'Phase 3 Complete', body: 'Writing fluency established.' },
+  { week: 24, title: 'Simulation Complete', body: 'Error logs closed and revised.' },
+  { week: 26, title: 'Exam Ready', body: 'All prep complete. Rest and perform.' },
+];
+
+export const ERROR_TYPES = {
+  A: { label: 'Knowledge Gap', color: '#ef4f5f' },
+  B: { label: 'Silly Mistake', color: '#ff9f1a' },
+  C: { label: 'Trap Question', color: '#b057d6' },
+};
+
+export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export const NON_NEGOTIABLE_RULES = [
+  'Never skip CS Honors Optional (Block 2).',
+  'Maintain separate WBCS and Misc error logs.',
+  'Misc-only topics in Weeks 13-16 are mandatory.',
+  'No new topics after Week 24. Revision only.',
+  'Writing practice continues every night.',
+  'Track mocks every Saturday.',
+];
