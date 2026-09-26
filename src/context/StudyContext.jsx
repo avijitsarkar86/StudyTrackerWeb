@@ -219,6 +219,12 @@ export function StudyProvider({ children }) {
 
     const scheduleCatchUp = (date, catchUpDate) => dispatch({ type: 'SET_MISSED', date, patch: { catchUpDate } });
 
+    const setCatchUpDecision = (date, decision) => dispatch({
+      type: 'SET_MISSED',
+      date,
+      patch: { catchUpDecision: decision, missedDate: date },
+    });
+
     const restoreData = (payload) => dispatch({ type: 'RESTORE', payload });
 
     const resetAll = () => {
@@ -243,6 +249,7 @@ export function StudyProvider({ children }) {
       updateSettings,
       logMissedDay,
       scheduleCatchUp,
+      setCatchUpDecision,
       restoreData,
       resetAll,
     };

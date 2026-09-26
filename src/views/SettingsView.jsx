@@ -1,10 +1,20 @@
 import { useRef } from 'react';
+import { NON_NEGOTIABLE_RULES } from '../constants/studyData';
 import { useStudy } from '../context/StudyContext';
+import { getCurrentWeek, getWeekDateRange } from '../utils/dateHelpers';
 import { clearPersistedState, exportStateAsFile, parseImportedBackup } from '../utils/storage';
 
 export default function SettingsView() {
   const { settings, updateSettings, dailyProgress, mockScores, errorLog, missedDays, restoreData, resetAll, cloud } = useStudy();
   const fileInputRef = useRef(null);
+  const week = getCurrentWeek(settings.startDate);
+  const weekRange = getWeekDateRange(week, settings.startDate);
+  const notifications = settings.notifications || {
+    enabled: false,
+    mockDayAlert: true,
+    morningTime: '06:00',
+    eveningTime: '22:00',
+  };
 
   const onExport = () => {
     exportStateAsFile({ dailyProgress, mockScores, errorLog, missedDays, settings });
@@ -41,8 +51,61 @@ export default function SettingsView() {
         </div>
       </div>
 
+      <div className="sub-header">Study Period</div>
+      <div className="settings-card">
+        <div className="settings-row"><span>Start Date</span><strong>{settings.startDate}</strong></div>
+        <div className="settings-row"><span>Current Week</span><strong>Week {week} of 26</strong></div>
+        <div className="settings-row"><span>Week Range</span><strong>{weekRange}</strong></div>
+      </div>
+
+      <div className="sub-header">Reminder Preferences (Web)</div>
+      <div className="settings-card">
+        <div className="toggle-row">
+          <div>
+            <strong>Enable reminders</strong>
+            <p className="muted">Stores your reminder preferences in profile settings.</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={Boolean(notifications.enabled)}
+            onChange={(e) => updateSettings({ notifications: { ...notifications, enabled: e.target.checked } })}
+          />
+        </div>
+        <div className="toggle-row">
+          <div>
+            <strong>Mock Saturday alerts</strong>
+            <p className="muted">Flag mock-day reminder preference.</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={Boolean(notifications.mockDayAlert)}
+            onChange={(e) => updateSettings({ notifications: { ...notifications, mockDayAlert: e.target.checked } })}
+          />
+        </div>
+        <div className="time-grid">
+          <label className="time-field">
+            <span className="label">Morning reminder</span>
+            <input
+              className="input"
+              type="time"
+              value={notifications.morningTime || '06:00'}
+              onChange={(e) => updateSettings({ notifications: { ...notifications, morningTime: e.target.value } })}
+            />
+          </label>
+          <label className="time-field">
+            <span className="label">Evening reminder</span>
+            <input
+              className="input"
+              type="time"
+              value={notifications.eveningTime || '22:00'}
+              onChange={(e) => updateSettings({ notifications: { ...notifications, eveningTime: e.target.value } })}
+            />
+          </label>
+        </div>
+      </div>
+
       <div className="sub-header">Timeline Configuration</div>
-      <table>
+      <table className="responsive-table">
         <thead>
           <tr>
             <th>Setting</th>
@@ -52,9 +115,9 @@ export default function SettingsView() {
         </thead>
         <tbody>
           <tr>
-            <td><strong>Start date</strong></td>
-            <td>{settings.startDate}</td>
-            <td>
+            <td data-label="Setting"><strong>Start date</strong></td>
+            <td data-label="Current Value">{settings.startDate}</td>
+            <td data-label="Update">
               <input
                 id="start-date-settings"
                 className="input"
@@ -65,9 +128,9 @@ export default function SettingsView() {
             </td>
           </tr>
           <tr>
-            <td><strong>Show onboarding on next load</strong></td>
-            <td>{settings.firstLaunchComplete ? 'No' : 'Yes'}</td>
-            <td>
+            <td data-label="Setting"><strong>Show onboarding on next load</strong></td>
+            <td data-label="Current Value">{settings.firstLaunchComplete ? 'No' : 'Yes'}</td>
+            <td data-label="Update">
               <select
                 id="first-launch"
                 className="input"
@@ -80,15 +143,15 @@ export default function SettingsView() {
             </td>
           </tr>
           <tr>
-            <td><strong>Cloud sync mode</strong></td>
-            <td>{cloud?.status || 'local-only'}</td>
-            <td>{cloud?.enabled ? 'Firebase enabled' : 'Add Firebase env keys to enable'}</td>
+            <td data-label="Setting"><strong>Cloud sync mode</strong></td>
+            <td data-label="Current Value">{cloud?.status || 'local-only'}</td>
+            <td data-label="Update">{cloud?.enabled ? 'Firebase enabled' : 'Add Firebase env keys to enable'}</td>
           </tr>
         </tbody>
       </table>
 
       <div className="sub-header">Backup & Restore</div>
-      <table>
+      <table className="responsive-table">
         <thead>
           <tr>
             <th>Action</th>
@@ -98,22 +161,22 @@ export default function SettingsView() {
         </thead>
         <tbody>
           <tr>
-            <td><strong>Export JSON backup</strong></td>
-            <td>Save all current data to a local JSON file.</td>
-            <td><button className="btn btn-primary" onClick={onExport}>Export</button></td>
+            <td data-label="Action"><strong>Export JSON backup</strong></td>
+            <td data-label="Description">Save all current data to a local JSON file.</td>
+            <td data-label="Execute"><button className="btn btn-primary" onClick={onExport}>Export</button></td>
           </tr>
           <tr>
-            <td><strong>Import JSON backup</strong></td>
-            <td>Restore tracker state from a previously exported JSON file.</td>
-            <td>
+            <td data-label="Action"><strong>Import JSON backup</strong></td>
+            <td data-label="Description">Restore tracker state from a previously exported JSON file.</td>
+            <td data-label="Execute">
               <button className="btn btn-ghost" onClick={() => fileInputRef.current?.click()}>Import</button>
               <input ref={fileInputRef} type="file" accept="application/json" className="hidden" onChange={onImport} />
             </td>
           </tr>
           <tr>
-            <td><strong>Reset all data</strong></td>
-            <td>Clear progress, mock scores, and error logs permanently.</td>
-            <td><button className="btn btn-danger" onClick={onReset}>Reset</button></td>
+            <td data-label="Action"><strong>Reset all data</strong></td>
+            <td data-label="Description">Clear progress, mock scores, and error logs permanently.</td>
+            <td data-label="Execute"><button className="btn btn-danger" onClick={onReset}>Reset</button></td>
           </tr>
         </tbody>
       </table>
@@ -123,6 +186,20 @@ export default function SettingsView() {
         <p>
           This web app uses LocalStorage by default and automatically switches to Firebase sync when valid VITE_FIREBASE_* environment keys are provided. JSON export/import remains available for backup.
         </p>
+      </div>
+
+      <div className="sub-header">Non-Negotiable Rules</div>
+      <div className="settings-card">
+        <ol className="rules-list">
+          {NON_NEGOTIABLE_RULES.map((rule) => (
+            <li key={rule}>{rule}</li>
+          ))}
+        </ol>
+      </div>
+
+      <div className="settings-foot muted">
+        <p>WBCS & WBPSC Study Tracker Web</p>
+        <p>Dual Exam Edition • 26-week cycle</p>
       </div>
 
       <div className="alert alert-info">

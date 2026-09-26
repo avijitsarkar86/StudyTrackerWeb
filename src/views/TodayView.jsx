@@ -1,6 +1,8 @@
+import { useEffect, useMemo, useState } from 'react';
 import {
   DAILY_BLOCKS,
   DAY_NAMES,
+  NON_NEGOTIABLE_RULES,
   PHASE3_OVERRIDE,
   SATURDAY_BLOCKS,
   SUNDAY_BLOCKS,
@@ -17,7 +19,8 @@ import {
 import { useStudy } from '../context/StudyContext';
 
 export default function TodayView() {
-  const { dailyProgress, updateDailyBlock, settings } = useStudy();
+  const { dailyProgress, updateDailyBlock, settings, missedDays, setCatchUpDecision } = useStudy();
+  const [ruleIdx, setRuleIdx] = useState(0);
 
   const todayKey = getTodayKey();
   const dayName = getDayNameFromDateKey(todayKey);
@@ -35,6 +38,22 @@ export default function TodayView() {
   const rotation = WEEKLY_ROTATION[dayName] || null;
   const block3 = week >= 13 && week <= 16 ? PHASE3_OVERRIDE[week] : rotation?.block3;
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRuleIdx((current) => (current + 1) % NON_NEGOTIABLE_RULES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const todayCatchUps = useMemo(() => {
+    return Object.entries(missedDays || {})
+      .filter(([, value]) => value?.catchUpDate === todayKey)
+      .map(([date, value]) => ({ date, ...value }));
+  }, [missedDays, todayKey]);
+
+  const pendingCatchUps = todayCatchUps.filter((item) => !item.catchUpDecision);
+  const activeCatchUp = todayCatchUps.find((item) => item.catchUpDecision === 'continue') || null;
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -48,6 +67,29 @@ export default function TodayView() {
           <span>Phase {phase.phase}</span>
         </div>
       </div>
+
+      <button className="rule-banner" onClick={() => setRuleIdx((ruleIdx + 1) % NON_NEGOTIABLE_RULES.length)}>
+        <strong>Rule:</strong>
+        <span>{NON_NEGOTIABLE_RULES[ruleIdx]}</span>
+      </button>
+
+      {pendingCatchUps.map((item) => (
+        <div key={item.date} className="catchup-card">
+          <p className="eyebrow">Catch-Up Scheduled</p>
+          <h3>Choose Today&apos;s Flow</h3>
+          <p className="muted">Missed date: {item.date}{item.reason ? ` · ${item.reason}` : ''}</p>
+          <div className="row-actions">
+            <button className="btn btn-ghost" onClick={() => setCatchUpDecision(item.date, 'skip')}>Skip Catch-Up</button>
+            <button className="btn btn-primary" onClick={() => setCatchUpDecision(item.date, 'continue')}>Continue Catch-Up</button>
+          </div>
+        </div>
+      ))}
+
+      {activeCatchUp && (
+        <div className="alert alert-info catchup-active">
+          <strong>Catch-Up Mode Active:</strong> You are currently covering the missed schedule for {activeCatchUp.missedDate || activeCatchUp.date}. Continue your core blocks first.
+        </div>
+      )}
 
       <div className="sub-header">Daily Completion Snapshot</div>
       <div className="progress-strip">

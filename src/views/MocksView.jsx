@@ -6,6 +6,7 @@ import { useStudy } from '../context/StudyContext';
 export default function MocksView() {
   const { mockScores, addMockScore, deleteMockScore, settings } = useStudy();
   const [tab, setTab] = useState('wbcs');
+  const [showForm, setShowForm] = useState(false);
   const [score, setScore] = useState('');
   const [weakArea, setWeakArea] = useState('');
 
@@ -14,6 +15,8 @@ export default function MocksView() {
   const target = SCORE_TARGETS[phase.phase] || SCORE_TARGETS[4];
   const [minTarget, maxTarget] = target[tab] || [0, 200];
   const entries = mockScores[tab] || [];
+  const tabColor = tab === 'wbcs' ? '#2c5282' : '#276749';
+  const lastScore = entries.length ? entries[entries.length - 1] : null;
 
   const sortedEntries = useMemo(() => [...entries].sort((a, b) => new Date(b.date) - new Date(a.date)), [entries]);
 
@@ -34,6 +37,13 @@ export default function MocksView() {
     });
     setScore('');
     setWeakArea('');
+    setShowForm(false);
+  };
+
+  const onDelete = (id) => {
+    const ok = window.confirm('Remove this mock score entry?');
+    if (!ok) return;
+    deleteMockScore(tab, id);
   };
 
   return (
@@ -50,62 +60,71 @@ export default function MocksView() {
       </div>
 
       <div className="sub-header">Score Target Progression</div>
-      <div className="target-card">
+      <div className="target-card" style={{ borderLeft: `4px solid ${tabColor}` }}>
         <h3>Phase {phase.phase} target</h3>
         <p className="target-score">{minTarget}-{maxTarget}<span>/200</span></p>
         <p className="muted">{target.label}</p>
+        {lastScore && (
+          <p className="muted" style={{ marginTop: 6 }}>
+            Last score: <strong>{lastScore.score}/200 ({lastScore.percentage}%)</strong>
+          </p>
+        )}
       </div>
 
-      <div className="sub-header">Add New Mock Entry</div>
-      <div className="form-grid">
-        <input className="input" type="number" min="0" max="200" placeholder="Score / 200" value={score} onChange={(e) => setScore(e.target.value)} />
-        <input className="input" placeholder="Top weak area" value={weakArea} onChange={(e) => setWeakArea(e.target.value)} />
-        <button className="btn btn-primary" onClick={onAdd}>Add score</button>
+      <div className="sub-header">Score History ({entries.length})</div>
+      <div className="row-actions" style={{ marginBottom: 10 }}>
+        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+          Add Score
+        </button>
       </div>
 
-      <div className="sub-header">Mock Score Tracker</div>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Week</th>
-            <th>Score / 200</th>
-            <th>%</th>
-            <th>Top Weak Area</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedEntries.length === 0 ? (
-            <tr>
-              <td colSpan={7} className="muted">No scores logged yet.</td>
-            </tr>
-          ) : (
-            sortedEntries.map((entry) => (
-              <tr key={entry.id}>
-                <td>{formatDateShort(entry.date)}</td>
-                <td>{entry.week}</td>
-                <td><strong>{entry.score}</strong></td>
-                <td>{entry.percentage}%</td>
-                <td>{entry.weakArea}</td>
-                <td>
-                  <span className={entry.score >= minTarget ? 'tag tag-green' : 'tag tag-red'}>
-                    {entry.score >= minTarget ? 'On Target' : 'Below Target'}
-                  </span>
-                </td>
-                <td>
-                  <button className="btn btn-ghost" onClick={() => deleteMockScore(tab, entry.id)}>Delete</button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <div className="list-stack">
+        {sortedEntries.length === 0 ? (
+          <div className="empty-card muted">No scores logged yet. Add your first mock score.</div>
+        ) : (
+          sortedEntries.map((entry) => (
+            <div key={entry.id} className="score-card">
+              <div className="score-main">
+                <div>
+                  <p className="score-value">{entry.score}<span>/200</span></p>
+                  <p className="muted">{entry.percentage}% · Week {entry.week}</p>
+                </div>
+                <span className={entry.score >= minTarget ? 'tag tag-green' : 'tag tag-red'}>
+                  {entry.score >= minTarget ? 'On Target' : 'Below Target'}
+                </span>
+              </div>
+              <p className="muted">{formatDateShort(entry.date)}</p>
+              <p className="score-weak">Weak area: {entry.weakArea}</p>
+              <div className="row-actions">
+                <button className="btn btn-ghost" onClick={() => onDelete(entry.id)}>Delete</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
       <div className="alert alert-info">
         <strong>Dual Strategy:</strong> Keep WBCS and Misc score patterns separate and compare trends after every 4 mocks.
       </div>
+
+      {showForm && (
+        <div className="overlay" onClick={() => setShowForm(false)}>
+          <div className="modal quick-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="panel-header" style={{ marginBottom: 12 }}>
+              <div>
+                <p className="eyebrow">New Mock</p>
+                <h3>{tab === 'wbcs' ? 'WBCS Prelims' : 'Misc Prelims'} · Week {week}</h3>
+              </div>
+              <button className="btn btn-ghost" onClick={() => setShowForm(false)}>Close</button>
+            </div>
+            <div className="form-grid">
+              <input className="input" type="number" min="0" max="200" placeholder="Score / 200" value={score} onChange={(e) => setScore(e.target.value)} />
+              <input className="input" placeholder="Top weak area" value={weakArea} onChange={(e) => setWeakArea(e.target.value)} />
+              <button className="btn btn-primary" onClick={onAdd}>Save Score</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

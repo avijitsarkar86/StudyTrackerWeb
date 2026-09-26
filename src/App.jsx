@@ -9,11 +9,11 @@ import SettingsView from './views/SettingsView';
 import TodayView from './views/TodayView';
 
 const NAV_ITEMS = [
-  { key: 'today', label: 'Today' },
-  { key: 'progress', label: 'Progress' },
-  { key: 'mocks', label: 'Mocks' },
-  { key: 'errors', label: 'Errors' },
-  { key: 'settings', label: 'Settings' },
+  { key: 'today', label: 'Today', short: 'TOD' },
+  { key: 'progress', label: 'Progress', short: 'PRG' },
+  { key: 'mocks', label: 'Mocks', short: 'MCK' },
+  { key: 'errors', label: 'Errors', short: 'ERR' },
+  { key: 'settings', label: 'Settings', short: 'SET' },
 ];
 
 function Shell() {
@@ -73,6 +73,20 @@ function Shell() {
 
         <main>{view}</main>
       </div>
+
+      <nav className="bottom-nav" aria-label="Mobile section navigation">
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.key}
+            className={activeTab === item.key ? 'bottom-nav-btn active' : 'bottom-nav-btn'}
+            onClick={() => setActiveTab(item.key)}
+            aria-label={item.label}
+          >
+            <span className="bottom-nav-short">{item.short}</span>
+            <span className="bottom-nav-label">{item.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {showOnboarding && (
         <OnboardingModal

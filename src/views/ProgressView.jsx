@@ -1,9 +1,30 @@
-import { DAILY_BLOCKS, MILESTONES, PHASES } from '../constants/studyData';
-import { calculateStreak, getCurrentWeek, getLast30DaysKeys, getOverallProgress, getPhaseInfo, getWeekDateRange, getTodayKey } from '../utils/dateHelpers';
+import { useMemo, useState } from 'react';
+import { DAILY_BLOCKS, DAY_NAMES, MILESTONES, PHASES, SATURDAY_BLOCKS, SUNDAY_BLOCKS } from '../constants/studyData';
+import {
+  calculateStreak,
+  getCurrentWeek,
+  getLast30DaysKeys,
+  getOverallProgress,
+  getPhaseInfo,
+  getWeekDateRange,
+  getTodayKey,
+  localDateKey,
+} from '../utils/dateHelpers';
 import { useStudy } from '../context/StudyContext';
 
+function dayBlockTemplate(dateKey) {
+  const day = DAY_NAMES[new Date(`${dateKey}T12:00:00`).getDay()];
+  if (day === 'Saturday') return SATURDAY_BLOCKS;
+  if (day === 'Sunday') return SUNDAY_BLOCKS;
+  return DAILY_BLOCKS;
+}
+
 export default function ProgressView() {
-  const { dailyProgress, settings } = useStudy();
+  const { dailyProgress, settings, missedDays, logMissedDay, scheduleCatchUp } = useStudy();
+  const [showWeekHistory, setShowWeekHistory] = useState(false);
+  const [reasonDrafts, setReasonDrafts] = useState({});
+  const [catchUpDrafts, setCatchUpDrafts] = useState({});
+
   const week = getCurrentWeek(settings.startDate);
   const phase = getPhaseInfo(week);
   const overall = getOverallProgress(week);
@@ -22,6 +43,98 @@ export default function ProgressView() {
   const last30 = getLast30DaysKeys(settings.startDate);
   const today = getTodayKey();
   const milestone = MILESTONES.find((m) => m.week >= week);
+
+  const autoMissedDays = useMemo(() => {
+    const start = new Date(`${settings.startDate}T00:00:00`);
+    const end = new Date(`${today}T00:00:00`);
+    end.setDate(end.getDate() - 1);
+
+    const list = [];
+    const current = new Date(start);
+    while (current <= end) {
+      const key = localDateKey(current);
+      const blocks = dailyProgress[key]?.blocks || {};
+      if (!Object.values(blocks).some(Boolean)) list.push(key);
+      current.setDate(current.getDate() + 1);
+    }
+    return list.sort((a, b) => b.localeCompare(a));
+  }, [dailyProgress, settings.startDate, today]);
+
+  const missedRows = useMemo(() => {
+    return autoMissedDays.map((dateKey) => {
+      const weekNum = getCurrentWeek(settings.startDate, dateKey);
+      return {
+        date: dateKey,
+        week: weekNum,
+        reason: missedDays[dateKey]?.reason || '',
+        catchUpDate: missedDays[dateKey]?.catchUpDate || '',
+      };
+    });
+  }, [autoMissedDays, missedDays, settings.startDate]);
+
+  const missedByWeek = useMemo(() => {
+    const grouped = new Map();
+    missedRows.forEach((item) => {
+      const bucket = grouped.get(item.week) || [];
+      bucket.push(item);
+      grouped.set(item.week, bucket);
+    });
+    return [...grouped.entries()].sort((a, b) => b[0] - a[0]);
+  }, [missedRows]);
+
+  const weekSummaries = useMemo(() => {
+    const start = new Date(`${settings.startDate}T00:00:00`);
+    const rows = [];
+    for (let w = 1; w < week; w += 1) {
+      const weekStart = new Date(start);
+      weekStart.setDate(weekStart.getDate() + (w - 1) * 7);
+      const keys = [];
+      for (let i = 0; i < 7; i += 1) {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        keys.push(localDateKey(d));
+      }
+
+      const studiedDays = keys.filter((key) => Object.values(dailyProgress[key]?.blocks || {}).some(Boolean)).length;
+      const completion = keys.length ? Math.round((studiedDays / keys.length) * 100) : 0;
+      const hours = keys.reduce((sum, key) => {
+        const blocks = dailyProgress[key]?.blocks || {};
+        const template = dayBlockTemplate(key);
+        const studyMap = new Map(template.map((b) => [b.id, b]));
+        return sum + Object.entries(blocks).reduce((inDay, [id, done]) => {
+          if (!done) return inDay;
+          const block = studyMap.get(id);
+          return block && block.category === 'study' ? inDay + block.hours : inDay;
+        }, 0);
+      }, 0);
+
+      rows.push({
+        week: w,
+        range: getWeekDateRange(w, settings.startDate),
+        completion,
+        studiedDays,
+        hours: Math.round(hours * 10) / 10,
+      });
+    }
+    return rows.reverse();
+  }, [dailyProgress, settings.startDate, week]);
+
+  const totalMissed = missedRows.length;
+  const plannedCatchups = missedRows.filter((item) => item.catchUpDate).length;
+
+  const saveMissedMeta = (dateKey) => {
+    const reason = (reasonDrafts[dateKey] ?? missedDays[dateKey]?.reason ?? '').trim();
+    const catchUpDate = (catchUpDrafts[dateKey] ?? missedDays[dateKey]?.catchUpDate ?? '').trim();
+
+    if (reason) logMissedDay(dateKey, reason);
+    if (catchUpDate) {
+      if (catchUpDate <= today) {
+        window.alert('Catch-up date must be in the future.');
+        return;
+      }
+      scheduleCatchUp(dateKey, catchUpDate);
+    }
+  };
 
   return (
     <section className="panel">
@@ -75,6 +188,80 @@ export default function ProgressView() {
             return <span title={`${key}: ${count} blocks`} key={key} className={`heat ${cls}`} />;
           })}
         </div>
+      </div>
+
+      <div className="sub-header">Week-by-Week Summary</div>
+      <div className="timeline-card">
+        <button className="accordion-toggle" onClick={() => setShowWeekHistory((v) => !v)}>
+          <strong>{showWeekHistory ? 'Hide Weekly History' : 'Show Weekly History'}</strong>
+          <span>{showWeekHistory ? '▲' : '▼'}</span>
+        </button>
+        {showWeekHistory && (
+          <div className="week-history-list">
+            {weekSummaries.map((row) => (
+              <div key={row.week} className="week-history-row">
+                <div>
+                  <strong>Week {row.week}</strong>
+                  <p className="muted">{row.range}</p>
+                </div>
+                <div className="week-history-kpis">
+                  <span>{row.completion}%</span>
+                  <span>{row.studiedDays}/7 days</span>
+                  <span>{row.hours}h</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="sub-header">Missed Days & Catch-Up</div>
+      <div className="timeline-card">
+        <div className="kpi-row">
+          <div className="kpi"><strong>{totalMissed}</strong><span>Missed</span></div>
+          <div className="kpi"><strong>{plannedCatchups}</strong><span>Planned</span></div>
+          <div className="kpi"><strong>{Math.max(totalMissed - plannedCatchups, 0)}</strong><span>Pending</span></div>
+        </div>
+
+        {missedByWeek.length === 0 ? (
+          <div className="empty-card muted" style={{ marginTop: 10 }}>No missed days detected yet.</div>
+        ) : (
+          <div className="missed-week-list">
+            {missedByWeek.map(([weekNum, rows]) => (
+              <div key={weekNum} className="missed-week-group">
+                <div className="missed-week-head">
+                  <strong>Week {weekNum}</strong>
+                  <span className="muted">{getWeekDateRange(weekNum, settings.startDate)}</span>
+                </div>
+                {rows.map((item) => {
+                  const reasonValue = reasonDrafts[item.date] ?? item.reason;
+                  const catchUpValue = catchUpDrafts[item.date] ?? item.catchUpDate;
+                  return (
+                    <div key={item.date} className="missed-item-row">
+                      <p><strong>{item.date}</strong></p>
+                      <div className="missed-controls">
+                        <input
+                          className="input"
+                          placeholder="Reason"
+                          value={reasonValue}
+                          onChange={(e) => setReasonDrafts((prev) => ({ ...prev, [item.date]: e.target.value }))}
+                        />
+                        <input
+                          className="input"
+                          type="date"
+                          value={catchUpValue}
+                          min={today}
+                          onChange={(e) => setCatchUpDrafts((prev) => ({ ...prev, [item.date]: e.target.value }))}
+                        />
+                        <button className="btn btn-primary" onClick={() => saveMissedMeta(item.date)}>Save</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {milestone && (
