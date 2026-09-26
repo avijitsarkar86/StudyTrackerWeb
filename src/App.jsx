@@ -100,6 +100,18 @@ function Shell() {
           <div className="meta-item"><div className="mlabel">Duration</div><div className="mvalue">26 Weeks</div></div>
           <div className="meta-item"><div className="mlabel">Phases</div><div className="mvalue">4 + Buffer</div></div>
           <div className="meta-item"><div className="mlabel">Storage</div><div className="mvalue">Local + JSON</div></div>
+          <div className="meta-item account-item">
+            {cloud?.user?.photoURL ? (
+              <img className="user-avatar" src={cloud.user.photoURL} alt="Signed-in profile" referrerPolicy="no-referrer" />
+            ) : (
+              <div className="user-avatar user-avatar-fallback">U</div>
+            )}
+            <div className="account-content">
+              <div className="mlabel">Signed In Account</div>
+              <div className="account-name">{cloud?.user?.displayName || 'Unknown User'}</div>
+              <div className="account-email">{cloud?.user?.email || 'No email available'}</div>
+            </div>
+          </div>
         </div>
       </header>
 

@@ -41,7 +41,7 @@ export { auth, db };
 export function subscribeToAuthState(callback) {
   if (!auth) {
     callback(null);
-    return () => {};
+    return () => { };
   }
   return onAuthStateChanged(auth, callback);
 }

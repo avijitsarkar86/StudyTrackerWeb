@@ -91,6 +91,52 @@ body {
   color: #fff;
 }
 
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: block;
+}
+
+.user-avatar-fallback {
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(99, 179, 237, 0.35);
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.account-content {
+  min-width: 0;
+}
+
+.account-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.account-email {
+  font-size: 11px;
+  color: #bee3f8;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 230px;
+}
+
 .page-body { padding: 36px 48px; }
 
 .section-header {
@@ -808,6 +854,14 @@ table .btn {
     min-width: 0;
     flex: 1 1 calc(50% - 8px);
     padding: 10px 12px;
+  }
+
+  .account-item {
+    flex: 1 1 100%;
+  }
+
+  .account-email {
+    max-width: 100%;
   }
 
   .page-body { padding: 14px; }

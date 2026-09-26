@@ -187,8 +187,20 @@ export default function SettingsView() {
           <strong>{cloud?.status || 'local-only'}</strong>
         </div>
         <div className="settings-row">
-          <span>Signed-in account</span>
-          <strong>{cloud?.user?.email || cloud?.user?.displayName || 'Not signed in'}</strong>
+          <span>Profile photo</span>
+          {cloud?.user?.photoURL ? (
+            <img className="user-avatar" src={cloud.user.photoURL} alt="Signed-in profile" referrerPolicy="no-referrer" />
+          ) : (
+            <strong>Not available</strong>
+          )}
+        </div>
+        <div className="settings-row">
+          <span>Display name</span>
+          <strong>{cloud?.user?.displayName || 'Not available'}</strong>
+        </div>
+        <div className="settings-row">
+          <span>Email address</span>
+          <strong>{cloud?.user?.email || 'Not available'}</strong>
         </div>
         {cloud?.authError ? <p className="muted">Auth error: {cloud.authError}</p> : null}
         <div className="table-actions" style={{ marginTop: 12 }}>
