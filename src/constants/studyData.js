@@ -5,10 +5,10 @@ export const DAILY_BLOCKS = [
   { id: 'vocab', label: 'Vocab Ritual', time: '07:45-08:15', hours: 0.5, category: 'study' },
   { id: 'block1', label: 'Block 1 - Primary GS', time: '08:15-10:45', hours: 2.5, category: 'study', isCore: true },
   { id: 'block1_c', label: 'Block 1 Consolidation', time: '10:45-11:15', hours: 0.5, category: 'study' },
-  { id: 'block2', label: 'Block 2 - CS Honors Optional', time: '11:30-13:30', hours: 2.0, category: 'study', isCore: true },
+  { id: 'block2', label: 'Block 2 - Compulsory Subject Booster', time: '11:30-13:30', hours: 2.0, category: 'study', isCore: true },
   { id: 'block3', label: 'Block 3 - Secondary GS', time: '15:00-17:00', hours: 2.0, category: 'study', isCore: true },
-  { id: 'block4', label: 'Block 4 - Mathematics', time: '17:00-17:30', hours: 0.5, category: 'study' },
-  { id: 'block5', label: 'Block 5 - Static GK', time: '17:30-18:00', hours: 0.5, category: 'study' },
+  { id: 'block4', label: 'Block 4 - Mathematics', time: '17:00-17:45', hours: 0.75, category: 'study' },
+  { id: 'block5', label: 'Block 5 - Static GK (Reduced)', time: '17:45-18:00', hours: 0.25, category: 'study' },
   { id: 'flute_pm', label: 'Flute - Evening', time: '18:00-18:30', hours: 0.5, category: 'wellness' },
   { id: 'block6', label: 'Block 6 - Current Affairs', time: '18:30-19:15', hours: 0.75, category: 'study' },
   { id: 'block7', label: 'Block 7 - Spaced Revision', time: '19:15-20:15', hours: 1.0, category: 'study' },
@@ -23,7 +23,8 @@ export const SATURDAY_BLOCKS = [
   { id: 'error_a', label: 'Mandatory Error Analysis', time: '15:00-17:00', hours: 2.0, category: 'study', isCore: true },
   { id: 'flute_pm', label: 'Flute - Evening', time: '17:00-17:30', hours: 0.5, category: 'wellness' },
   { id: 'tgt_rev', label: 'Targeted Revision', time: '17:30-19:30', hours: 2.0, category: 'study' },
-  { id: 'light_ca', label: 'Light CA / Flashcards', time: '22:00-23:30', hours: 1.5, category: 'study' },
+  { id: 'math_booster_sat', label: 'Math Booster (DI / Arithmetic)', time: '22:00-22:45', hours: 0.75, category: 'study' },
+  { id: 'light_ca', label: 'Light CA / Flashcards', time: '22:45-23:30', hours: 0.75, category: 'study' },
 ];
 
 export const SUNDAY_BLOCKS = [
@@ -33,17 +34,26 @@ export const SUNDAY_BLOCKS = [
   { id: 'eng_paper', label: 'English Descriptive Paper', time: '08:30-10:30', hours: 2.0, category: 'study', isCore: true },
   { id: 'ben_paper', label: 'Bengali Paper (Timed)', time: '10:30-12:30', hours: 2.0, category: 'study', isCore: true },
   { id: 'weak_area', label: 'Weak Area Deep-Dive', time: '12:30-13:30', hours: 1.0, category: 'study' },
-  { id: 'cs_honors_sun', label: 'CS Honors Problem-Solving', time: '15:00-17:00', hours: 2.0, category: 'study' },
+  { id: 'comp_subject_sun', label: 'Compulsory Subject Analysis', time: '15:00-17:00', hours: 2.0, category: 'study' },
   { id: 'flute_pm', label: 'Flute - Evening', time: '17:00-17:30', hours: 0.5, category: 'wellness' },
-  { id: 'wk_plan', label: 'Next Week Planning', time: '22:00-23:00', hours: 1.0, category: 'planning' },
+  { id: 'math_review_sun', label: 'Math Error Review', time: '22:00-22:30', hours: 0.5, category: 'study' },
+  { id: 'wk_plan', label: 'Next Week Planning', time: '22:30-23:00', hours: 0.5, category: 'planning' },
 ];
 
 export const WEEKLY_ROTATION = {
-  Monday: { block1: 'Indian History - Ancient & Medieval', block3: 'Physical Geography of India' },
-  Tuesday: { block1: 'Indian History - Modern & Freedom Struggle', block3: 'West Bengal Geography + Districts' },
-  Wednesday: { block1: 'Indian Polity - Constitution, FR, DPSP', block3: 'Indian Economy - Planning, Agriculture' },
-  Thursday: { block1: 'Indian Polity - Parliament, Judiciary, Local Bodies', block3: 'RBI, Banking, WB Economy & Budget' },
+  Monday: { block1: 'Indian History - Ancient & Medieval', block3: 'Indian Polity - Constitution, FR, DPSP' },
+  Tuesday: { block1: 'Indian History - Modern & Freedom Struggle', block3: 'Indian Polity - Parliament, Judiciary, Local Bodies' },
+  Wednesday: { block1: 'Geography - Physical India', block3: 'Indian Economy - Planning, Agriculture' },
+  Thursday: { block1: 'Geography - West Bengal + Districts', block3: 'RBI, Banking, WB Economy & Budget' },
   Friday: { block1: 'General Science (Physics, Chemistry, Biology)', block3: 'Environment, Ecology, Computer Awareness' },
+};
+
+export const BLOCK2_ROTATION = {
+  Monday: { module: 'Polity', practice: 'PYQs + 5-line recall summary' },
+  Tuesday: { module: 'History', practice: 'Timeline drills + 10 MCQs' },
+  Wednesday: { module: 'Geography', practice: 'Map work + location-based recall' },
+  Thursday: { module: 'Economy', practice: 'Data interpretation + current affairs links' },
+  Friday: { module: 'Science', practice: 'Fact recall + formula/diagram practice' },
 };
 
 export const PHASE3_OVERRIDE = {
@@ -73,17 +83,17 @@ export const SCORE_TARGETS = {
 };
 
 export const WEEK_PLAN = [
-  { week: 1, topic: 'Polity - Laxmikanth Ch 1-20' },
-  { week: 2, topic: 'Polity - Ch 21-40' },
-  { week: 3, topic: 'History - NCERT 6-8 + Bipan Chandra' },
-  { week: 4, topic: 'History - Modern + Freedom Struggle' },
-  { week: 5, topic: 'Geography - NCERT 11-12 + India Geography' },
-  { week: 6, topic: 'WB Geography + CS Module' },
-  { week: 7, topic: 'Economy - Basics, Planning, Agriculture' },
-  { week: 8, topic: 'Economy - RBI, Banking, Budget + PYQs' },
-  { week: 9, topic: 'Science - Physics, Chemistry, Biology' },
-  { week: 10, topic: 'Environment - Full Revision + PYQs' },
-  { week: 11, topic: 'Polity + History - 2nd read + WBCS PYQs' },
+  { week: 1, topic: 'History + Polity - Ancient + Constitution' },
+  { week: 2, topic: 'History + Polity - Modern + Parliament' },
+  { week: 3, topic: 'History + Polity - NCERT 6-8 + Laxmikanth' },
+  { week: 4, topic: 'History + Polity - Freedom Struggle + Judiciary' },
+  { week: 5, topic: 'Geography + Economy - India Geography + Planning' },
+  { week: 6, topic: 'Geography + Economy - WB Geography + Budget' },
+  { week: 7, topic: 'Geography + Economy - 2nd reading + PYQs' },
+  { week: 8, topic: 'Geography + Economy - RBI, Banking + PYQs' },
+  { week: 9, topic: 'Science + Environment - Physics/Chemistry/Biology' },
+  { week: 10, topic: 'Science + Environment - Full Revision + PYQs' },
+  { week: 11, topic: 'History + Polity - 2nd read + WBCS PYQs' },
   { week: 12, topic: 'Geography + Economy - 2nd read + Misc PYQs' },
   { week: 13, topic: 'Computer Awareness (MCQ focus)' },
   { week: 14, topic: 'Office Procedure & Admin' },
@@ -91,10 +101,10 @@ export const WEEK_PLAN = [
   { week: 16, topic: 'WB Local Govt Deep-Dive' },
   { week: 17, topic: 'English Mains - timed papers' },
   { week: 18, topic: 'Bengali Mains - timed papers' },
-  { week: 19, topic: 'Polity + History final revision' },
+  { week: 19, topic: 'History + Polity final revision' },
   { week: 20, topic: 'Geography + Economy final revision' },
   { week: 21, topic: 'Science + Environment + Computer Awareness' },
-  { week: 22, topic: 'CS Honors full revision + timed answers' },
+  { week: 22, topic: 'Full compulsory revision + timed answers' },
   { week: 23, topic: '3 WBCS mocks + 3 Misc mocks' },
   { week: 24, topic: 'Final error logs review' },
   { week: 25, topic: '2 mocks + rest + light CA' },
@@ -119,7 +129,7 @@ export const ERROR_TYPES = {
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export const NON_NEGOTIABLE_RULES = [
-  'Never skip CS Honors Optional (Block 2).',
+  'Never leave Block 2 empty.',
   'Maintain separate WBCS and Misc error logs.',
   'Misc-only topics in Weeks 13-16 are mandatory.',
   'No new topics after Week 24. Revision only.',

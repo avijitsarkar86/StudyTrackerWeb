@@ -5,11 +5,13 @@ import { StudyProvider, useStudy } from './context/StudyContext';
 import ErrorsView from './views/ErrorsView';
 import MocksView from './views/MocksView';
 import ProgressView from './views/ProgressView';
+import RotationView from './views/RotationView';
 import SettingsView from './views/SettingsView';
 import TodayView from './views/TodayView';
 
 const NAV_ITEMS = [
   { key: 'today', label: 'Today', short: 'TOD' },
+  { key: 'rotation', label: 'Rotation', short: 'ROT' },
   { key: 'progress', label: 'Progress', short: 'PRG' },
   { key: 'mocks', label: 'Mocks', short: 'MCK' },
   { key: 'errors', label: 'Errors', short: 'ERR' },
@@ -23,6 +25,7 @@ function Shell() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const view = useMemo(() => {
+    if (activeTab === 'rotation') return <RotationView />;
     if (activeTab === 'progress') return <ProgressView />;
     if (activeTab === 'mocks') return <MocksView />;
     if (activeTab === 'errors') return <ErrorsView />;
