@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { BarChart3, Calendar, ChevronDown, ChevronUp, Clock, Flame, Trophy, TrendingUp, XCircle } from 'lucide-react';
 import { DAILY_BLOCKS, DAY_NAMES, MILESTONES, PHASES, SATURDAY_BLOCKS, SUNDAY_BLOCKS } from '../constants/studyData';
 import {
   calculateStreak,
@@ -11,6 +12,7 @@ import {
   localDateKey,
 } from '../utils/dateHelpers';
 import { useStudy } from '../context/StudyContext';
+import { useDialog } from '../hooks/useDialog';
 
 function dayBlockTemplate(dateKey) {
   const day = DAY_NAMES[new Date(`${dateKey}T12:00:00`).getDay()];
@@ -21,6 +23,7 @@ function dayBlockTemplate(dateKey) {
 
 export default function ProgressView() {
   const { dailyProgress, settings, missedDays, logMissedDay, scheduleCatchUp } = useStudy();
+  const { showToast, Dialog } = useDialog();
   const [showWeekHistory, setShowWeekHistory] = useState(false);
   const [reasonDrafts, setReasonDrafts] = useState({});
   const [catchUpDrafts, setCatchUpDrafts] = useState({});
@@ -141,17 +144,29 @@ export default function ProgressView() {
       <div className="panel-header">
         <div>
           <p className="eyebrow">Section 02</p>
-          <h2>Progress Dashboard</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 7 }}><BarChart3 size={18} color="#3182ce" /> Progress Dashboard</h2>
         </div>
         <div className="week-range">{getWeekDateRange(week, settings.startDate)}</div>
       </div>
 
       <div className="sub-header">Performance Summary</div>
       <div className="kpi-row four">
-        <div className="kpi"><strong>{daysStudied}</strong><span>Days studied</span></div>
-        <div className="kpi"><strong>{streak}</strong><span>Streak</span></div>
-        <div className="kpi"><strong>{Math.round(totalHours * 10) / 10}h</strong><span>Study hours</span></div>
-        <div className="kpi"><strong>{overall}%</strong><span>Overall progress</span></div>
+        <div className="kpi">
+          <div className="kpi-head"><Calendar size={13} color="#3182ce" /><strong>{daysStudied}</strong></div>
+          <span>Days studied</span>
+        </div>
+        <div className="kpi">
+          <div className="kpi-head"><Flame size={13} color="#F39C12" /><strong>{streak}</strong></div>
+          <span>Streak</span>
+        </div>
+        <div className="kpi">
+          <div className="kpi-head"><Clock size={13} color="#805ad5" /><strong>{Math.round(totalHours * 10) / 10}h</strong></div>
+          <span>Study hours</span>
+        </div>
+        <div className="kpi">
+          <div className="kpi-head"><TrendingUp size={13} color="#38a169" /><strong>{overall}%</strong></div>
+          <span>Overall progress</span>
+        </div>
       </div>
 
       <div className="sub-header">26-Week Master Timeline</div>
@@ -194,7 +209,7 @@ export default function ProgressView() {
       <div className="timeline-card">
         <button className="accordion-toggle" onClick={() => setShowWeekHistory((v) => !v)}>
           <strong>{showWeekHistory ? 'Hide Weekly History' : 'Show Weekly History'}</strong>
-          <span>{showWeekHistory ? '▲' : '▼'}</span>
+          {showWeekHistory ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         {showWeekHistory && (
           <div className="week-history-list">
@@ -218,9 +233,18 @@ export default function ProgressView() {
       <div className="sub-header">Missed Days & Catch-Up</div>
       <div className="timeline-card">
         <div className="kpi-row">
-          <div className="kpi"><strong>{totalMissed}</strong><span>Missed</span></div>
-          <div className="kpi"><strong>{plannedCatchups}</strong><span>Planned</span></div>
-          <div className="kpi"><strong>{Math.max(totalMissed - plannedCatchups, 0)}</strong><span>Pending</span></div>
+          <div className="kpi">
+            <div className="kpi-head"><XCircle size={13} color="#e53e3e" /><strong>{totalMissed}</strong></div>
+            <span>Missed</span>
+          </div>
+          <div className="kpi">
+            <div className="kpi-head"><Calendar size={13} color="#3182ce" /><strong>{plannedCatchups}</strong></div>
+            <span>Planned</span>
+          </div>
+          <div className="kpi">
+            <div className="kpi-head"><Clock size={13} color="#d69e2e" /><strong>{Math.max(totalMissed - plannedCatchups, 0)}</strong></div>
+            <span>Pending</span>
+          </div>
         </div>
 
         {missedByWeek.length === 0 ? (
@@ -266,12 +290,17 @@ export default function ProgressView() {
 
       {milestone && (
         <div className="milestone">
-          <h3>Next Milestone: Week {milestone.week}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <Trophy size={16} color="#d69e2e" />
+            <h3>Next Milestone: Week {milestone.week}</h3>
+          </div>
           <strong>{milestone.title}</strong>
           <p>{milestone.body}</p>
           <p className="muted">Current phase: {phase.name}</p>
         </div>
       )}
+
+      {Dialog}
 
       <div className="alert alert-success">
         <strong>Key Insight:</strong> Consistent weekly execution is more important than isolated high-score days.

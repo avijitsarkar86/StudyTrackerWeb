@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, Circle, Flame, Layers2, ShieldAlert, TrendingUp } from 'lucide-react';
+import { BookMarked, BookOpen, Briefcase, CheckCircle2, Circle, Flame, Layers2, ShieldAlert, TrendingUp } from 'lucide-react';
 import {
+  BLOCK2_ROTATION,
   DAILY_BLOCKS,
+  DAILY_BLOCKS_WORKING,
   DAY_NAMES,
   NON_NEGOTIABLE_RULES,
   PHASE3_OVERRIDE,
@@ -29,7 +31,10 @@ export default function TodayView() {
   const week = getCurrentWeek(settings.startDate, todayKey);
   const phase = getPhaseInfo(week);
 
-  const blocks = dayIndex === 6 ? SATURDAY_BLOCKS : dayIndex === 0 ? SUNDAY_BLOCKS : DAILY_BLOCKS;
+  const weekdayBlocks = settings.workingProfMode ? DAILY_BLOCKS_WORKING : DAILY_BLOCKS;
+  const rawBlocks = dayIndex === 6 ? SATURDAY_BLOCKS : dayIndex === 0 ? SUNDAY_BLOCKS : weekdayBlocks;
+  // Work block is informational only — excluded from completion metrics
+  const blocks = rawBlocks.filter((b) => b.category !== 'work');
   const dayData = dailyProgress[todayKey] || { blocks: {}, notes: '' };
 
   const completedCount = blocks.filter((b) => dayData.blocks[b.id]).length;
@@ -37,6 +42,8 @@ export default function TodayView() {
 
   const weekTopic = WEEK_PLAN.find((w) => w.week === week)?.topic || 'General Revision';
   const rotation = WEEKLY_ROTATION[dayName] || null;
+  // Weeks 1-10: Block 1 is dedicated to the week's chapter target (matches mobile app logic)
+  const block1 = week <= 10 ? weekTopic : rotation?.block1;
   const block3 = week >= 13 && week <= 16 ? PHASE3_OVERRIDE[week] : rotation?.block3;
 
   useEffect(() => {
@@ -112,22 +119,78 @@ export default function TodayView() {
         </div>
       </div>
 
-      <div className="sub-header">Weekly Rotation Context</div>
-      <div className="subject-card">
-        <h3>Weekly Focus</h3>
-        <p>{weekTopic}</p>
-        {rotation && (
-          <div className="subject-grid">
-            <div><span>Block 1</span><strong>{rotation.block1}</strong></div>
-            <div><span>Block 3</span><strong>{block3}</strong></div>
+      <div className="sub-header"><BookOpen size={13} /> This Week's Chapter Goal</div>
+      <div className="subject-card week-goal-card">
+        <div className="week-goal-header">
+          <div>
+            <p className="eyebrow">Week {week} · {phase.shortName}</p>
+            <p className="week-goal-topic">{weekTopic}</p>
           </div>
-        )}
+          <span className={`tag ${week <= 10 ? 'tag-blue' : 'tag-yellow'}`}>
+            {week <= 10 ? 'Deep Read' : 'Revision'}
+          </span>
+        </div>
+        <p className="week-goal-note muted">
+          {week <= 10
+            ? 'Block 1 is dedicated to this chapter every day this week.'
+            : 'Chapter complete — Block 1 now follows the daily rotation.'}
+        </p>
       </div>
+
+      {rotation && (
+        <>
+          <div className="sub-header"><BookMarked size={13} /> Today’s Subjects — {dayName}</div>
+          <div className="subject-card">
+            <div className="block-subject-row">
+              <span className="block-badge b1">B1</span>
+              <div>
+                <strong>{block1}</strong>
+                {week <= 10 && <span className="small muted"> · chapter deep-read</span>}
+              </div>
+            </div>
+            <div className="block-subject-divider" />
+            <div className="block-subject-row">
+              <span className="block-badge b2">B2</span>
+              <div>
+                <strong>{BLOCK2_ROTATION[dayName]?.module}</strong>
+                <p className="small muted">{BLOCK2_ROTATION[dayName]?.practice}</p>
+              </div>
+            </div>
+            <div className="block-subject-divider" />
+            <div className="block-subject-row">
+              <span className="block-badge b3">B3</span>
+              <div>
+                <strong>{block3}</strong>
+                {week >= 13 && week <= 16 && <span className="small muted"> · Misc-only block</span>}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="sub-header">Today's Block Checklist</div>
       <div className="task-list">
-        {blocks.map((block) => {
+        {rawBlocks.map((block) => {
+          if (block.category === 'work') {
+            return (
+              <div key={block.id} className="task-row work-block-row">
+                <div>
+                  <strong>{block.label}</strong>
+                  <p>{block.time}</p>
+                </div>
+                <div className="task-meta">
+                  <span>{block.hours}h</span>
+                  <Briefcase size={18} color="#d69e2e" />
+                </div>
+              </div>
+            );
+          }
           const checked = Boolean(dayData.blocks[block.id]);
+          const blockSubject =
+            block.id === 'block1' ? block1 :
+            block.id === 'block2' ? BLOCK2_ROTATION[dayName]?.module :
+            block.id === 'block3' ? block3 :
+            null;
           return (
             <button
               key={block.id}
@@ -136,6 +199,7 @@ export default function TodayView() {
             >
               <div>
                 <strong>{block.label}</strong>
+                {blockSubject && <p className="block-subject-inline">{blockSubject}</p>}
                 <p>{block.time}</p>
               </div>
               <div className="task-meta">

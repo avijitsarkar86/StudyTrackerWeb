@@ -21,6 +21,7 @@ const DEFAULT_SETTINGS = {
   startDate: DEFAULT_START,
   firstLaunchComplete: false,
   scheduleOffset: 0,
+  workingProfMode: false,
 };
 
 const initialState = {

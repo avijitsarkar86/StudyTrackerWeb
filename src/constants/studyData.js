@@ -1,7 +1,6 @@
 export const DAILY_BLOCKS = [
   { id: 'warmup', label: 'Warm-up / Exercise', time: '06:00-06:30', hours: 0.5, category: 'wellness' },
-  { id: 'flute_am', label: 'Flute - Morning', time: '06:30-07:00', hours: 0.5, category: 'wellness' },
-  { id: 'plant_care', label: 'Plant Care', time: '07:00-07:45', hours: 0.75, category: 'wellness' },
+  { id: 'plant_care', label: 'Plant Care', time: '06:30-07:15', hours: 0.75, category: 'wellness' },
   { id: 'vocab', label: 'Vocab Ritual', time: '07:45-08:15', hours: 0.5, category: 'study' },
   { id: 'block1', label: 'Block 1 - Primary GS', time: '08:15-10:45', hours: 2.5, category: 'study', isCore: true },
   { id: 'block1_c', label: 'Block 1 Consolidation', time: '10:45-11:15', hours: 0.5, category: 'study' },
@@ -28,8 +27,7 @@ export const SATURDAY_BLOCKS = [
 ];
 
 export const SUNDAY_BLOCKS = [
-  { id: 'flute_am', label: 'Flute - Morning', time: '06:30-07:00', hours: 0.5, category: 'wellness' },
-  { id: 'plant_care', label: 'Plant Care (Extended)', time: '07:00-08:00', hours: 1.0, category: 'wellness' },
+  { id: 'plant_care', label: 'Plant Care (Extended)', time: '06:30-07:30', hours: 1.0, category: 'wellness' },
   { id: 'vocab', label: 'Vocab Ritual (Light)', time: '08:00-08:30', hours: 0.5, category: 'study' },
   { id: 'eng_paper', label: 'English Descriptive Paper', time: '08:30-10:30', hours: 2.0, category: 'study', isCore: true },
   { id: 'ben_paper', label: 'Bengali Paper (Timed)', time: '10:30-12:30', hours: 2.0, category: 'study', isCore: true },
@@ -55,6 +53,24 @@ export const BLOCK2_ROTATION = {
   Thursday: { module: 'Economy', practice: 'Data interpretation + current affairs links' },
   Friday: { module: 'Science', practice: 'Fact recall + formula/diagram practice' },
 };
+
+// Working-professional variant: ~8.75h study + 4h work window, math increased to 1h
+export const DAILY_BLOCKS_WORKING = [
+  { id: 'warmup', label: 'Warm-up / Exercise', time: '06:00-06:30', hours: 0.5, category: 'wellness' },
+  { id: 'plant_care', label: 'Plant Care', time: '06:30-07:00', hours: 0.5, category: 'wellness' },
+  { id: 'vocab', label: 'Vocab Ritual', time: '07:30-08:00', hours: 0.5, category: 'study' },
+  { id: 'block1', label: 'Block 1 - Primary GS', time: '08:00-10:00', hours: 2.0, category: 'study', isCore: true },
+  { id: 'block1_c', label: 'Block 1 Consolidation', time: '10:00-10:15', hours: 0.25, category: 'study' },
+  { id: 'work', label: 'Professional Work', time: '10:30-14:30', hours: 4.0, category: 'work' },
+  { id: 'block2', label: 'Block 2 - Compulsory Subject', time: '15:00-16:30', hours: 1.5, category: 'study', isCore: true },
+  { id: 'block3', label: 'Block 3 - Secondary GS', time: '16:30-18:00', hours: 1.5, category: 'study', isCore: true },
+  { id: 'flute_pm', label: 'Flute - Evening', time: '18:00-18:30', hours: 0.5, category: 'wellness' },
+  { id: 'block4', label: 'Block 4 - Mathematics', time: '18:30-19:30', hours: 1.0, category: 'study' },
+  { id: 'block6', label: 'Block 6 - Current Affairs', time: '19:30-20:15', hours: 0.75, category: 'study' },
+  { id: 'block7', label: 'Block 7 - Spaced Revision', time: '20:15-21:15', hours: 1.0, category: 'study' },
+  { id: 'block8', label: 'Block 8 - Writing Practice', time: '22:00-22:30', hours: 0.5, category: 'study' },
+  { id: 'block9', label: 'Block 9 - Light Revision', time: '22:30-23:00', hours: 0.5, category: 'study' },
+];
 
 export const PHASE3_OVERRIDE = {
   13: 'Computer Awareness (Exam MCQ Pattern Focus)',

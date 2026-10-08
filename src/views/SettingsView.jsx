@@ -1,8 +1,10 @@
 import { useRef } from 'react';
+import { Bell, Briefcase, Calendar, Cloud, Download, GitBranch, HardDrive, LogOut, Settings, Shield, Trash2, Upload } from 'lucide-react';
 import { NON_NEGOTIABLE_RULES } from '../constants/studyData';
 import { useStudy } from '../context/StudyContext';
 import { getCurrentWeek, getWeekDateRange } from '../utils/dateHelpers';
 import { clearPersistedState, exportStateAsFile, parseImportedBackup } from '../utils/storage';
+import { useDialog } from '../hooks/useDialog';
 
 export default function SettingsView() {
   const {
@@ -19,6 +21,7 @@ export default function SettingsView() {
     signOutFromCloud,
   } = useStudy();
   const fileInputRef = useRef(null);
+  const { confirm, showToast, Dialog } = useDialog();
   const week = getCurrentWeek(settings.startDate);
   const weekRange = getWeekDateRange(week, settings.startDate);
   const notifications = settings.notifications || {
@@ -39,16 +42,16 @@ export default function SettingsView() {
     try {
       const parsed = parseImportedBackup(text);
       restoreData(parsed);
-      alert('Backup imported successfully.');
+      showToast('Backup imported successfully.');
     } catch (err) {
-      alert(err.message || 'Invalid backup file.');
+      showToast(err.message || 'Invalid backup file.', 'error');
     } finally {
       event.target.value = '';
     }
   };
 
-  const onReset = () => {
-    const ok = window.confirm('Delete all progress, mocks, and error logs? This cannot be undone.');
+  const onReset = async () => {
+    const ok = await confirm('Delete all progress, mocks, and error logs? This cannot be undone.', { title: 'Reset all data', dangerous: true });
     if (!ok) return;
     clearPersistedState();
     resetAll();
@@ -63,7 +66,7 @@ export default function SettingsView() {
   };
 
   const onSignOutGoogle = async () => {
-    const ok = window.confirm('Sign out from Google cloud sync on this browser? Local data will remain available.');
+    const ok = await confirm('Sign out from Google cloud sync on this browser? Local data will remain available.', { title: 'Sign out' });
     if (!ok) return;
     try {
       await signOutFromCloud();
@@ -77,18 +80,33 @@ export default function SettingsView() {
       <div className="panel-header">
         <div>
           <p className="eyebrow">Section 05</p>
-          <h2>Settings & Data</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 7 }}><Settings size={18} color="#3182ce" /> Settings &amp; Data</h2>
         </div>
       </div>
 
-      <div className="sub-header">Study Period</div>
+      <div className="sub-header"><Calendar size={13} /> Study Period</div>
       <div className="settings-card">
         <div className="settings-row"><span>Start Date</span><strong>{settings.startDate}</strong></div>
         <div className="settings-row"><span>Current Week</span><strong>Week {week} of 26</strong></div>
         <div className="settings-row"><span>Week Range</span><strong>{weekRange}</strong></div>
       </div>
 
-      <div className="sub-header">Reminder Preferences (Web)</div>
+      <div className="sub-header"><Briefcase size={13} /> Schedule Mode</div>
+      <div className="settings-card">
+        <div className="toggle-row">
+          <div>
+            <strong>Working Professional Mode</strong>
+            <p className="muted">Shifts to a 8.75h study plan with a 4h work window (10:30–14:30). Math extended to 1h/day. Block 1, 2 &amp; 3 trimmed to fit.</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={Boolean(settings.workingProfMode)}
+            onChange={(e) => updateSettings({ workingProfMode: e.target.checked })}
+          />
+        </div>
+      </div>
+
+      <div className="sub-header"><Bell size={13} /> Reminder Preferences (Web)</div>
       <div className="settings-card">
         <div className="toggle-row">
           <div>
@@ -134,7 +152,7 @@ export default function SettingsView() {
         </div>
       </div>
 
-      <div className="sub-header">Timeline Configuration</div>
+      <div className="sub-header"><GitBranch size={13} /> Timeline Configuration</div>
       <table className="responsive-table">
         <thead>
           <tr>
@@ -180,7 +198,7 @@ export default function SettingsView() {
         </tbody>
       </table>
 
-      <div className="sub-header">Google Cloud Sync</div>
+      <div className="sub-header"><Cloud size={13} /> Google Cloud Sync</div>
       <div className="settings-card">
         <div className="settings-row">
           <span>Connection</span>
@@ -206,7 +224,7 @@ export default function SettingsView() {
         <div className="table-actions" style={{ marginTop: 12 }}>
           {cloud?.enabled ? (
             cloud?.uid ? (
-              <button className="btn btn-ghost" onClick={onSignOutGoogle}>Sign Out</button>
+              <button className="btn btn-ghost" onClick={onSignOutGoogle}><LogOut size={13} /> Sign Out</button>
             ) : (
               <button className="btn btn-primary" onClick={onConnectGoogle}>Sign In with Google</button>
             )
@@ -216,7 +234,7 @@ export default function SettingsView() {
         </div>
       </div>
 
-      <div className="sub-header">Backup & Restore</div>
+      <div className="sub-header"><HardDrive size={13} /> Backup &amp; Restore</div>
       <table className="responsive-table">
         <thead>
           <tr>
@@ -235,7 +253,7 @@ export default function SettingsView() {
             <td data-label="Action"><strong>Import JSON backup</strong></td>
             <td data-label="Description">Restore tracker state from a previously exported JSON file.</td>
             <td data-label="Execute">
-              <button className="btn btn-ghost" onClick={() => fileInputRef.current?.click()}>Import</button>
+              <button className="btn btn-ghost" onClick={() => fileInputRef.current?.click()}><Upload size={13} /> Import</button>
               <input ref={fileInputRef} type="file" accept="application/json" className="hidden" onChange={onImport} />
             </td>
           </tr>
@@ -254,7 +272,7 @@ export default function SettingsView() {
         </p>
       </div>
 
-      <div className="sub-header">Non-Negotiable Rules</div>
+      <div className="sub-header"><Shield size={13} /> Non-Negotiable Rules</div>
       <div className="settings-card">
         <ol className="rules-list">
           {NON_NEGOTIABLE_RULES.map((rule) => (
@@ -271,6 +289,7 @@ export default function SettingsView() {
       <div className="alert alert-info">
         <strong>Recommended:</strong> Export a JSON backup after every mock weekend to avoid accidental data loss.
       </div>
+      {Dialog}
     </section>
   );
 }

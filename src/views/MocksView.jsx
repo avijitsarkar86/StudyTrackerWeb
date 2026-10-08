@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
+import { ClipboardX, FileCheck, PlusCircle, Trash2, X } from 'lucide-react';
 import { SCORE_TARGETS } from '../constants/studyData';
 import { formatDateShort, getCurrentWeek, getPhaseInfo } from '../utils/dateHelpers';
 import { useStudy } from '../context/StudyContext';
+import { useDialog } from '../hooks/useDialog';
 
 export default function MocksView() {
   const { mockScores, addMockScore, deleteMockScore, settings } = useStudy();
+  const { confirm, showToast, Dialog } = useDialog();
   const [tab, setTab] = useState('wbcs');
   const [showForm, setShowForm] = useState(false);
   const [score, setScore] = useState('');
@@ -23,7 +26,7 @@ export default function MocksView() {
   const onAdd = () => {
     const parsed = Number(score);
     if (!Number.isFinite(parsed) || parsed < 0 || parsed > 200) {
-      alert('Enter a valid score between 0 and 200.');
+      showToast('Enter a valid score between 0 and 200.', 'error');
       return;
     }
     addMockScore(tab, {
@@ -40,8 +43,8 @@ export default function MocksView() {
     setShowForm(false);
   };
 
-  const onDelete = (id) => {
-    const ok = window.confirm('Remove this mock score entry?');
+  const onDelete = async (id) => {
+    const ok = await confirm('Remove this mock score entry?', { dangerous: true });
     if (!ok) return;
     deleteMockScore(tab, id);
   };
@@ -51,7 +54,7 @@ export default function MocksView() {
       <div className="panel-header">
         <div>
           <p className="eyebrow">Section 03</p>
-          <h2>Mock Tracker</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 7 }}><FileCheck size={18} color="#3182ce" /> Mock Tracker</h2>
         </div>
         <div className="tab-group">
           <button className={tab === 'wbcs' ? 'tab active' : 'tab'} onClick={() => setTab('wbcs')}>WBCS</button>
@@ -74,13 +77,17 @@ export default function MocksView() {
       <div className="sub-header">Score History ({entries.length})</div>
       <div className="row-actions" style={{ marginBottom: 10 }}>
         <button className="btn btn-primary" onClick={() => setShowForm(true)}>
-          Add Score
+          <PlusCircle size={13} /> Add Score
         </button>
       </div>
 
       <div className="list-stack">
         {sortedEntries.length === 0 ? (
-          <div className="empty-card muted">No scores logged yet. Add your first mock score.</div>
+          <div className="empty-card">
+            <ClipboardX size={36} color="#cbd5e0" />
+            <p className="muted">No scores logged yet.</p>
+            <p className="small muted">Add your first mock score above.</p>
+          </div>
         ) : (
           sortedEntries.map((entry) => (
             <div key={entry.id} className="score-card">
@@ -96,7 +103,7 @@ export default function MocksView() {
               <p className="muted">{formatDateShort(entry.date)}</p>
               <p className="score-weak">Weak area: {entry.weakArea}</p>
               <div className="row-actions">
-                <button className="btn btn-ghost" onClick={() => onDelete(entry.id)}>Delete</button>
+                <button className="btn btn-ghost" onClick={() => onDelete(entry.id)}><Trash2 size={12} /> Delete</button>
               </div>
             </div>
           ))
@@ -115,7 +122,7 @@ export default function MocksView() {
                 <p className="eyebrow">New Mock</p>
                 <h3>{tab === 'wbcs' ? 'WBCS Prelims' : 'Misc Prelims'} · Week {week}</h3>
               </div>
-              <button className="btn btn-ghost" onClick={() => setShowForm(false)}>Close</button>
+              <button className="btn btn-ghost" onClick={() => setShowForm(false)}><X size={13} /></button>
             </div>
             <div className="form-grid">
               <input className="input" type="number" min="0" max="200" placeholder="Score / 200" value={score} onChange={(e) => setScore(e.target.value)} />
@@ -125,6 +132,7 @@ export default function MocksView() {
           </div>
         </div>
       )}
+      {Dialog}
     </section>
   );
 }

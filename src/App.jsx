@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import './index.css';
-import { AlertCircle, BarChart3, BookOpen, Calendar, Cloud, FileCheck, LogIn, RefreshCw, Settings, Shield, Wifi } from 'lucide-react';
+import { AlertCircle, BarChart3, BookOpen, Calendar, Cloud, FileCheck, Flame, LogIn, RefreshCw, Settings, Shield, Wifi } from 'lucide-react';
 import OnboardingModal from './components/OnboardingModal';
 import { StudyProvider, useStudy } from './context/StudyContext';
 import ErrorsView from './views/ErrorsView';
@@ -9,6 +9,7 @@ import ProgressView from './views/ProgressView';
 import RotationView from './views/RotationView';
 import SettingsView from './views/SettingsView';
 import TodayView from './views/TodayView';
+import { calculateStreak } from './utils/dateHelpers';
 
 const NAV_ITEMS = [
   { key: 'today',    label: 'Today',    Icon: Calendar    },
@@ -20,7 +21,8 @@ const NAV_ITEMS = [
 ];
 
 function Shell() {
-  const { isLoaded, settings, updateSettings, cloud, signInWithGoogle } = useStudy();
+  const { isLoaded, settings, updateSettings, cloud, signInWithGoogle, dailyProgress } = useStudy();
+  const streak = calculateStreak(dailyProgress || {});
   const [activeTab, setActiveTab] = useState('today');
   const [startDate, setStartDate] = useState(new Date());
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -93,7 +95,13 @@ function Shell() {
         <div className="cover-meta">
           <div className="meta-item"><div className="mlabel">Duration</div><div className="mvalue">26 Weeks</div></div>
           <div className="meta-item"><div className="mlabel">Phases</div><div className="mvalue">4 + Buffer</div></div>
-          <div className="meta-item"><div className="mlabel">Storage</div><div className="mvalue">Local + JSON</div></div>
+          <div className="meta-item">
+            <div className="mlabel">Streak</div>
+            <div className="kpi-head" style={{ justifyContent: 'center' }}>
+              <Flame size={14} color="#F39C12" />
+              <div className="mvalue">{streak} day{streak !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
           <div className="meta-item account-item">
             {cloud?.user?.photoURL ? (
               <img className="user-avatar" src={cloud.user.photoURL} alt="Signed-in profile" referrerPolicy="no-referrer" />
