@@ -1,3 +1,4 @@
+import { CalendarClock, ArrowRight } from 'lucide-react';
 import { PHASES } from '../constants/studyData';
 import { getWeekDateRange, localDateKey } from '../utils/dateHelpers';
 
@@ -16,7 +17,10 @@ export default function OnboardingModal({ selectedDate, onDateChange, onStart })
     <div className="overlay">
       <div className="modal onboarding">
         <div className="cover-ribbon">WBCS + WBPSC Misc 2026-27</div>
-        <h1>Study Tracker Web</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0 4px' }}>
+          <CalendarClock size={28} color="#3182ce" />
+          <h1 style={{ margin: 0 }}>Study Tracker Web</h1>
+        </div>
         <p className="muted">Set your preparation start date to generate the 26-week schedule.</p>
 
         <label className="label" htmlFor="start-date">Preparation start date</label>
@@ -40,7 +44,10 @@ export default function OnboardingModal({ selectedDate, onDateChange, onStart })
           ))}
         </div>
 
-        <button className="btn btn-primary" onClick={onStart}>Generate My Timeline</button>
+        <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', gap: 8, marginTop: 4, padding: '12px 20px', fontSize: 14 }} onClick={onStart}>
+          <ArrowRight size={16} />
+          Generate My Timeline
+        </button>
       </div>
     </div>
   );

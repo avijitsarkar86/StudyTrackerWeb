@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import './index.css';
+import { AlertCircle, BarChart3, BookOpen, Calendar, Cloud, FileCheck, LogIn, RefreshCw, Settings, Shield, Wifi } from 'lucide-react';
 import OnboardingModal from './components/OnboardingModal';
 import { StudyProvider, useStudy } from './context/StudyContext';
 import ErrorsView from './views/ErrorsView';
@@ -10,12 +11,12 @@ import SettingsView from './views/SettingsView';
 import TodayView from './views/TodayView';
 
 const NAV_ITEMS = [
-  { key: 'today', label: 'Today', short: 'TOD' },
-  { key: 'rotation', label: 'Rotation', short: 'ROT' },
-  { key: 'progress', label: 'Progress', short: 'PRG' },
-  { key: 'mocks', label: 'Mocks', short: 'MCK' },
-  { key: 'errors', label: 'Errors', short: 'ERR' },
-  { key: 'settings', label: 'Settings', short: 'SET' },
+  { key: 'today',    label: 'Today',    Icon: Calendar    },
+  { key: 'rotation', label: 'Rotation', Icon: RefreshCw   },
+  { key: 'progress', label: 'Progress', Icon: BarChart3   },
+  { key: 'mocks',    label: 'Mocks',    Icon: FileCheck   },
+  { key: 'errors',   label: 'Errors',   Icon: AlertCircle },
+  { key: 'settings', label: 'Settings', Icon: Settings    },
 ];
 
 function Shell() {
@@ -56,33 +57,23 @@ function Shell() {
 
   if (cloud?.enabled && !cloud?.uid) {
     return (
-      <div className="container">
-        <header className="cover">
-          <div className="badge">Official Study Blueprint - Dual Exam Edition</div>
-          <h1>
-            WBCS &amp; WBPSC
-            <br />
-            <span>Study Tracker Web</span>
-          </h1>
-          <p className="cover-sub">Sign in with your Google account to start and keep your data synced across devices.</p>
-          <div className="cover-divider" />
-          <div className="cover-meta">
-            <div className="meta-item"><div className="mlabel">Auth</div><div className="mvalue">Google Required</div></div>
-            <div className="meta-item"><div className="mlabel">Storage</div><div className="mvalue">Cloud + Local</div></div>
-            <div className="meta-item"><div className="mlabel">Sync</div><div className="mvalue">Per Account</div></div>
+      <div className="sign-in-screen">
+        <div className="sign-in-card">
+          <div className="sign-in-icon">
+            <BookOpen size={28} color="#63b3ed" />
           </div>
-        </header>
-
-        <div className="page-body">
-          <div className="alert alert-info">
-            <strong>Login required.</strong> Please sign in with Google to continue.
-            <div className="row-actions" style={{ marginTop: 8 }}>
-              <button className="btn btn-primary" onClick={onSignIn} disabled={isSigningIn}>
-                {isSigningIn ? 'Signing in...' : 'Continue with Google'}
-              </button>
-            </div>
-            {cloud?.authError ? <p className="muted">{cloud.authError}</p> : null}
+          <h1>WBCS &amp; WBPSC<br /><span>Study Tracker</span></h1>
+          <p>Official dual-exam study companion. Sign in with Google to sync your progress across all devices.</p>
+          <div className="sign-in-badges">
+            <div className="sign-in-badge"><Shield size={11} />Secure</div>
+            <div className="sign-in-badge"><Cloud size={11} />Cloud sync</div>
+            <div className="sign-in-badge"><Wifi size={11} />Cross-device</div>
           </div>
+          <button className="btn btn-primary btn-google" onClick={onSignIn} disabled={isSigningIn}>
+            <LogIn size={16} />
+            {isSigningIn ? 'Signing in...' : 'Continue with Google'}
+          </button>
+          {cloud?.authError ? <p className="sign-in-error">{cloud.authError}</p> : null}
         </div>
       </div>
     );
@@ -125,13 +116,14 @@ function Shell() {
         </div>
 
         <nav className="main-nav">
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.map(({ key, label, Icon }) => (
             <button
-              key={item.key}
-              className={activeTab === item.key ? 'nav-btn active' : 'nav-btn'}
-              onClick={() => setActiveTab(item.key)}
+              key={key}
+              className={activeTab === key ? 'nav-btn active' : 'nav-btn'}
+              onClick={() => setActiveTab(key)}
             >
-              {item.label}
+              <Icon size={13} />
+              {label}
             </button>
           ))}
         </nav>
@@ -140,15 +132,15 @@ function Shell() {
       </div>
 
       <nav className="bottom-nav" aria-label="Mobile section navigation">
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.map(({ key, label, Icon }) => (
           <button
-            key={item.key}
-            className={activeTab === item.key ? 'bottom-nav-btn active' : 'bottom-nav-btn'}
-            onClick={() => setActiveTab(item.key)}
-            aria-label={item.label}
+            key={key}
+            className={activeTab === key ? 'bottom-nav-btn active' : 'bottom-nav-btn'}
+            onClick={() => setActiveTab(key)}
+            aria-label={label}
           >
-            <span className="bottom-nav-short">{item.short}</span>
-            <span className="bottom-nav-label">{item.label}</span>
+            <Icon size={18} />
+            <span className="bottom-nav-label">{label}</span>
           </button>
         ))}
       </nav>

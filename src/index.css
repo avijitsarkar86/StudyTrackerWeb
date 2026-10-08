@@ -193,7 +193,7 @@ body {
   min-height: 38px;
 }
 
-.nav-btn { flex: 0 0 auto; }
+.nav-btn { flex: 0 0 auto; display: flex; align-items: center; gap: 5px; }
 
 .nav-btn.active,
 .tab.active {
@@ -283,6 +283,7 @@ body {
   padding: 10px;
 }
 
+.kpi-head { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
 .kpi strong { display: block; font-size: 16px; color: #1a365d; }
 .kpi span { color: #718096; font-size: 11px; }
 
@@ -336,8 +337,9 @@ body {
 .task-row p { font-size: 11px; color: #718096; }
 
 .task-row.done {
-  opacity: 0.65;
+  opacity: 0.7;
   background: #f0fff4;
+  border-left: 3px solid #38a169;
 }
 
 .task-meta {
@@ -555,6 +557,88 @@ table .btn {
   font-size: 16px;
 }
 
+.sign-in-screen {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0f1724 0%, #1a1a2e 50%, #0f3460 100%);
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.sign-in-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: min(420px, 100%);
+  text-align: center;
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.sign-in-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(74, 158, 255, 0.15);
+  border: 1px solid rgba(74, 158, 255, 0.35);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+}
+
+.sign-in-card h1 {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.sign-in-card h1 span { color: #63b3ed; }
+
+.sign-in-card p {
+  font-size: 13px;
+  color: #a0aec0;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.sign-in-badges {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.sign-in-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: #bee3f8;
+}
+
+.btn-google {
+  width: 100%;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 13px 20px;
+  font-size: 14px;
+  min-height: 48px;
+}
+
+.sign-in-error {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #fc8181;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -562,7 +646,8 @@ table .btn {
   display: grid;
   place-items: center;
   padding: 16px;
-  z-index: 20;
+  z-index: 30;
+  overflow-y: auto;
 }
 
 .modal {
@@ -575,6 +660,8 @@ table .btn {
 .onboarding {
   width: min(760px, 100%);
   padding: 18px;
+  max-height: 90dvh;
+  overflow-y: auto;
 }
 
 .quick-modal {
@@ -897,7 +984,7 @@ table .btn {
     bottom: 0;
     z-index: 22;
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 6px;
     padding: 8px 8px 12px;
     background: rgba(255, 255, 255, 0.97);
@@ -906,33 +993,32 @@ table .btn {
   }
 
   .bottom-nav-btn {
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    background: #fff;
-    color: #4a5568;
-    min-height: 50px;
-    padding: 5px 4px;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    gap: 1px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #718096;
+    min-height: 52px;
+    padding: 5px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: color 0.15s, background 0.15s;
   }
 
   .bottom-nav-btn.active {
     background: #ebf8ff;
-    border-color: #90cdf4;
     color: #2c5282;
+    border-radius: 10px;
   }
 
-  .bottom-nav-short {
-    font-size: 9px;
-    letter-spacing: 0.8px;
-    font-weight: 700;
-  }
+  .bottom-nav-short { display: none; }
 
   .bottom-nav-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
+    letter-spacing: 0.3px;
   }
 
   .nav-btn {

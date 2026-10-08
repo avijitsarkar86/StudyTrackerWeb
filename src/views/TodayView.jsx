@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, Circle, Flame, Layers2, ShieldAlert, TrendingUp } from 'lucide-react';
 import {
   DAILY_BLOCKS,
   DAY_NAMES,
@@ -69,7 +70,7 @@ export default function TodayView() {
       </div>
 
       <button className="rule-banner" onClick={() => setRuleIdx((ruleIdx + 1) % NON_NEGOTIABLE_RULES.length)}>
-        <strong>Rule:</strong>
+        <ShieldAlert size={14} style={{ flexShrink: 0, marginTop: 1 }} />
         <span>{NON_NEGOTIABLE_RULES[ruleIdx]}</span>
       </button>
 
@@ -97,9 +98,18 @@ export default function TodayView() {
       </div>
 
       <div className="kpi-row">
-        <div className="kpi"><strong>{completion}%</strong><span>Completion</span></div>
-        <div className="kpi"><strong>{completedCount}/{blocks.length}</strong><span>Blocks done</span></div>
-        <div className="kpi"><strong>Wk {week}</strong><span>{phase.shortName}</span></div>
+        <div className="kpi">
+          <div className="kpi-head"><TrendingUp size={13} color="#3182ce" /><strong>{completion}%</strong></div>
+          <span>Completion</span>
+        </div>
+        <div className="kpi">
+          <div className="kpi-head"><Layers2 size={13} color="#805ad5" /><strong>{completedCount}/{blocks.length}</strong></div>
+          <span>Blocks done</span>
+        </div>
+        <div className="kpi">
+          <div className="kpi-head"><Flame size={13} color={phase.color} /><strong>Wk {week}</strong></div>
+          <span>{phase.shortName}</span>
+        </div>
       </div>
 
       <div className="sub-header">Weekly Rotation Context</div>
@@ -130,7 +140,9 @@ export default function TodayView() {
               </div>
               <div className="task-meta">
                 <span>{block.hours}h</span>
-                <span className={`check ${checked ? 'active' : ''}`}>{checked ? 'YES' : 'NO'}</span>
+                {checked
+                  ? <CheckCircle2 size={18} color="#38a169" />
+                  : <Circle size={18} color="#cbd5e0" />}
               </div>
             </button>
           );
