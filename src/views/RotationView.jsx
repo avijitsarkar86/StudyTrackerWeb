@@ -1,4 +1,5 @@
 import { BLOCK2_ROTATION, WEEKLY_ROTATION, WEEK_PLAN } from '../constants/studyData';
+import { useStudy } from '../context/StudyContext';
 
 const weekPairs = [
   { weeks: '1-4', block1: 'History + Polity', block2: 'Polity booster' },
@@ -9,6 +10,8 @@ const weekPairs = [
 ];
 
 export default function RotationView() {
+  const { settings } = useStudy();
+  const proMode = Boolean(settings.workingProfMode);
   const block1Rows = Object.entries(WEEKLY_ROTATION);
   const block2Rows = Object.entries(BLOCK2_ROTATION);
 
@@ -21,6 +24,18 @@ export default function RotationView() {
           <p className="muted">Block 1 and Block 2 are paired here so you can see the weekly subject flow in one place.</p>
         </div>
       </div>
+
+      {proMode && (
+        <div className="alert alert-warning">
+          <strong>Working Professional Mode active.</strong> Schedule differences vs standard:
+          <ul style={{ margin: '6px 0 0 16px', lineHeight: 1.7 }}>
+            <li>Block 1: 2h (08:00–10:00) · Block 2: 1.5h (15:00–16:30) · Block 3: 1.5h (16:30–18:00)</li>
+            <li>Work window: 10:30–14:30 (4h) between B1 Consolidation and Block 2</li>
+            <li>Block 4 Math: 1h (18:30–19:30) · Static GK (Block 5) removed</li>
+          </ul>
+          Subject rotation below is unchanged — only the hours and timings differ.
+        </div>
+      )}
 
       <div className="sub-header">Rotation Map</div>
       <div className="subject-grid" style={{ marginBottom: 14 }}>
@@ -113,7 +128,7 @@ export default function RotationView() {
       </div>
 
       <div className="alert alert-info">
-        <strong>Math note:</strong> Block 4 is 45 minutes on weekdays, with extra math boosters on Saturday and Sunday.
+        <strong>Math note:</strong> Block 4 is {proMode ? '1 hour (18:30–19:30)' : '45 minutes (17:00–17:45)'} on weekdays, with extra math boosters on Saturday and Sunday.
       </div>
     </section>
   );

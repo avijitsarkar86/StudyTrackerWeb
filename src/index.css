@@ -401,6 +401,14 @@ body {
   margin: 2px 0 1px;
 }
 
+.block-desc {
+  font-size: 10.5px;
+  color: #718096;
+  line-height: 1.4;
+  margin: 2px 0 2px;
+  font-style: italic;
+}
+
 .task-row.done {
   opacity: 0.7;
   background: #f0fff4;

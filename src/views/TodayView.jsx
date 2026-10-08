@@ -42,8 +42,8 @@ export default function TodayView() {
 
   const weekTopic = WEEK_PLAN.find((w) => w.week === week)?.topic || 'General Revision';
   const rotation = WEEKLY_ROTATION[dayName] || null;
-  // Weeks 1-10: Block 1 is dedicated to the week's chapter target (matches mobile app logic)
-  const block1 = week <= 10 ? weekTopic : rotation?.block1;
+  // Block 1 and Block 3 always follow daily rotation; WEEK_PLAN is a chapter reference only
+  const block1 = rotation?.block1;
   const block3 = week >= 13 && week <= 16 ? PHASE3_OVERRIDE[week] : rotation?.block3;
 
   useEffect(() => {
@@ -119,22 +119,18 @@ export default function TodayView() {
         </div>
       </div>
 
-      <div className="sub-header"><BookOpen size={13} /> This Week's Chapter Goal</div>
+      <div className="sub-header"><BookOpen size={13} /> This Week's Chapter Target</div>
       <div className="subject-card week-goal-card">
         <div className="week-goal-header">
           <div>
             <p className="eyebrow">Week {week} · {phase.shortName}</p>
             <p className="week-goal-topic">{weekTopic}</p>
           </div>
-          <span className={`tag ${week <= 10 ? 'tag-blue' : 'tag-yellow'}`}>
-            {week <= 10 ? 'Deep Read' : 'Revision'}
+          <span className={`tag ${week <= 12 ? 'tag-blue' : 'tag-yellow'}`}>
+            {week <= 6 ? 'Deep Read' : week <= 12 ? 'PYQ Depth' : 'Misc / Revision'}
           </span>
         </div>
-        <p className="week-goal-note muted">
-          {week <= 10
-            ? 'Block 1 is dedicated to this chapter every day this week.'
-            : 'Chapter complete — Block 1 now follows the daily rotation.'}
-        </p>
+        <p className="week-goal-note muted">Books and chapters to focus on this week. Block 1 and Block 3 subjects come from the daily rotation below.</p>
       </div>
 
       {rotation && (
@@ -200,6 +196,7 @@ export default function TodayView() {
               <div>
                 <strong>{block.label}</strong>
                 {blockSubject && <p className="block-subject-inline">{blockSubject}</p>}
+                {block.desc && <p className="block-desc">{block.desc}</p>}
                 <p>{block.time}</p>
               </div>
               <div className="task-meta">

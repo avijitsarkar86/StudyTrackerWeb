@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { BarChart3, Calendar, ChevronDown, ChevronUp, Clock, Flame, Trophy, TrendingUp, XCircle } from 'lucide-react';
-import { DAILY_BLOCKS, DAY_NAMES, MILESTONES, PHASES, SATURDAY_BLOCKS, SUNDAY_BLOCKS } from '../constants/studyData';
+import { DAILY_BLOCKS, DAILY_BLOCKS_WORKING, DAY_NAMES, MILESTONES, PHASES, SATURDAY_BLOCKS, SUNDAY_BLOCKS } from '../constants/studyData';
 import {
   calculateStreak,
   getCurrentWeek,
@@ -14,11 +14,11 @@ import {
 import { useStudy } from '../context/StudyContext';
 import { useDialog } from '../hooks/useDialog';
 
-function dayBlockTemplate(dateKey) {
+function dayBlockTemplate(dateKey, proMode) {
   const day = DAY_NAMES[new Date(`${dateKey}T12:00:00`).getDay()];
   if (day === 'Saturday') return SATURDAY_BLOCKS;
   if (day === 'Sunday') return SUNDAY_BLOCKS;
-  return DAILY_BLOCKS;
+  return proMode ? DAILY_BLOCKS_WORKING : DAILY_BLOCKS;
 }
 
 export default function ProgressView() {
@@ -34,7 +34,8 @@ export default function ProgressView() {
   const streak = calculateStreak(dailyProgress);
 
   const daysStudied = Object.values(dailyProgress).filter((d) => Object.values(d.blocks || {}).some(Boolean)).length;
-  const studyBlockMap = new Map(DAILY_BLOCKS.map((b) => [b.id, b]));
+  const weekdayBlocks = settings.workingProfMode ? DAILY_BLOCKS_WORKING : DAILY_BLOCKS;
+  const studyBlockMap = new Map(weekdayBlocks.map((b) => [b.id, b]));
   const totalHours = Object.values(dailyProgress).reduce((sum, day) => {
     return sum + Object.entries(day.blocks || {}).reduce((inDay, [id, done]) => {
       if (!done) return inDay;
@@ -102,7 +103,7 @@ export default function ProgressView() {
       const completion = keys.length ? Math.round((studiedDays / keys.length) * 100) : 0;
       const hours = keys.reduce((sum, key) => {
         const blocks = dailyProgress[key]?.blocks || {};
-        const template = dayBlockTemplate(key);
+        const template = dayBlockTemplate(key, settings.workingProfMode);
         const studyMap = new Map(template.map((b) => [b.id, b]));
         return sum + Object.entries(blocks).reduce((inDay, [id, done]) => {
           if (!done) return inDay;
