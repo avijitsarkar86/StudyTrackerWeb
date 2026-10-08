@@ -1,4 +1,4 @@
-import { BLOCK2_ROTATION, WEEKLY_ROTATION, WEEK_PLAN } from '../constants/studyData';
+import { BLOCK2_ROTATION, PHASE3_OVERRIDE, WEEKLY_ROTATION, WEEK_PLAN } from '../constants/studyData';
 import { useStudy } from '../context/StudyContext';
 
 const weekPairs = [
@@ -21,7 +21,7 @@ export default function RotationView() {
         <div>
           <p className="eyebrow">Section 08</p>
           <h2>Weekly Subject-Rotation Matrix</h2>
-          <p className="muted">Block 1 and Block 2 are paired here so you can see the weekly subject flow in one place.</p>
+          <p className="muted">Block 1, Block 2, and Block 3 are shown here so you can see the full daily subject flow in one place.</p>
         </div>
       </div>
 
@@ -38,16 +38,21 @@ export default function RotationView() {
       )}
 
       <div className="sub-header">Rotation Map</div>
-      <div className="subject-grid" style={{ marginBottom: 14 }}>
+      <div className="subject-grid" style={{ marginBottom: 14, gridTemplateColumns: 'repeat(3, 1fr)' }}>
         <div>
           <span>Block 1</span>
           <strong>Primary GS rotation</strong>
-          <p className="muted">Use this for the main reading block from Monday to Friday.</p>
+          <p className="muted">Main reading block, Mon–Fri.</p>
         </div>
         <div>
           <span>Block 2</span>
           <strong>Compulsory subject booster</strong>
-          <p className="muted">Use this for the daily paired revision and practice slot.</p>
+          <p className="muted">Daily paired revision and practice slot.</p>
+        </div>
+        <div>
+          <span>Block 3</span>
+          <strong>Secondary GS rotation</strong>
+          <p className="muted">Different subject from Block 1. Weeks 13–16 overridden by Misc-only topics.</p>
         </div>
       </div>
 
@@ -95,6 +100,40 @@ export default function RotationView() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="sub-header">Block 3 Rotation</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Secondary GS Subject</th>
+          </tr>
+        </thead>
+        <tbody>
+          {block1Rows.map(([day, rotation]) => (
+            <tr key={day}>
+              <td><strong>{day}</strong></td>
+              <td>{rotation.block3}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="note-box">
+        <strong>Weeks 13–16 override (Misc-only)</strong>
+        <p className="muted" style={{ marginTop: 6 }}>During weeks 13–16 Block 3 is replaced daily with a fixed Misc-only topic regardless of the day-of-week rotation above.</p>
+        <table style={{ marginTop: 10 }}>
+          <thead><tr><th>Week</th><th>Block 3 Topic</th></tr></thead>
+          <tbody>
+            {Object.entries(PHASE3_OVERRIDE).map(([week, topic]) => (
+              <tr key={week}>
+                <td><strong>Week {week}</strong></td>
+                <td>{topic}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="sub-header">How the Phases Use This Matrix</div>
